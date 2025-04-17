@@ -1,0 +1,24 @@
+name: Tests
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  bun:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🧁 Set up bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    - name: 😺 Checkout code
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.ref }}
+
+    - name: 🧁 add dependancies
+      run: bun i
