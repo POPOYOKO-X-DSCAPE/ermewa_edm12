@@ -10,7 +10,8 @@
 	},
 	"scripts": {
 		"dev": "bunx --bun vite --port 3000",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"offlineServices": "bun run ./src/infra-structures/offline-services/file-server.ts & bun run ./src/infra-structures/offline-services/api-server.ts"
 	},
 	"dependencies": {
 		"react": "^19.0.0",

@@ -1,0 +1,134 @@
+@use "sass:color";
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap');
+
+/* Fondations */
+/* Fonts */
+
+
+@mixin font-family-head {
+    font-family: "Work Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+@mixin font-family-body {
+    font-family: "Merriweather", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+/* Font sizes */
+$font-size-default: 12px;
+
+/* Sizes */
+
+$sizing-base: 4px;
+$clickzone-min-size: 48px;
+
+/* Spacings */
+
+$spacing-base: $sizing-base;
+
+$padding-base: $sizing-base*2;
+
+/* Radius */
+
+$radius-base: 2px;
+$radius-infinite: 100%;
+
+/* Borders */
+$border-base: 1px;
+
+
+/* Shadows */
+@mixin inner-shadow {
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 4px 15px -3px inset;
+}
+
+@mixin elevated-shadow {
+    z-index: 1;
+    box-shadow: 0px 0px $sizing-base*4 $sizing-base rgba(0, 0, 0, 0.1);
+
+}
+
+/* Colors */
+/* Brand */
+
+$black: #0E0204;
+$white: #FAFAFA;
+$primary: #2a04d1;
+$info: #0b2ef1;
+$yellow: #FCD53F;
+/* Semantic */
+
+$bg-default-initial: mix($white, $primary, 95%);
+$fg-default-initial: mix($black, $primary, 95%);
+$bg-default-hover: mix($white, $primary, 80%);
+$fg-default-hover: mix($black, $primary, 80%);
+$bg-default-active: mix($white, $primary, 95%);
+$fg-default-active: mix($black, $primary, 100%);
+
+$bg-elevated-initial: color.adjust($bg-default-initial, $lightness: 95%);
+$fg-elevated-initial: color.adjust($fg-default-initial, $lightness: 5%);
+$bg-elevated-hover: color.adjust($bg-elevated-initial, $lightness: -95%);
+$fg-elevated-hover: color.adjust($fg-elevated-initial, $lightness: 2%);
+
+$bg-dialog-initial: color.adjust($white, $lightness: 10%);
+$fg-dialog-initial: color.adjust($black, $lightness: 90%);
+
+$bg-overlay-initial: color.adjust($black, $alpha: 0.2);
+
+$bg-action-initial: $primary;
+$fg-action-initial: $white;
+$bg-action-hover: color.adjust($bg-action-initial, $lightness: 20%);
+$fg-action-hover: color.adjust($fg-action-initial, $lightness: 80%);
+
+$bg-info-initial: $primary;
+$bg-info-hover: color.adjust($primary, $lightness: 10%);
+$fg-info-initial: $white;
+$fg-info-hover: color.adjust($fg-info-initial, $lightness: 20%);
+
+$bg-interaction-initial: color.adjust($white, $lightness: 0%);
+$fg-interaction-initial: $black;
+$bg-interaction-hover: color.adjust($bg-interaction-initial, $lightness: -7%);
+$fg-interaction-hover: color.adjust($fg-interaction-initial, $lightness: 20%);
+$fg-interaction-active: $primary;
+$bg-interaction-active: color.adjust(blue, $alpha: -0.9);
+$bg-info-initial: color.adjust($info, $lightness: 45%);
+$fg-info-initial: $info;
+$bg-info-hover: color.adjust($bg-info-initial, $lightness: 20%);
+$fg-info-hover: color.adjust($fg-info-initial, $lightness: 20%);
+
+/*Scrollbar*/
+
+@property --scrollOpacity {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0.3;
+}
+
+@property --scrollColor {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: color.adjust($fg-interaction-initial, $alpha: -0.8);
+}
+
+@mixin scrollbar {
+
+    &::-webkit-scrollbar {
+        width: $sizing-base*4;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border: $sizing-base solid transparent;
+        background-clip: padding-box;
+        border-radius: 9999px;
+        background-color: var(--scrollColor);
+    }
+
+    &:hover {
+        --scrollOpacity: 0.8;
+        --scrollColor: red;
+    }
+}

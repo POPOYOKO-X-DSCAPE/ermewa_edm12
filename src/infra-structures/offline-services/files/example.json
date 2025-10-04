@@ -1,0 +1,172 @@
+{
+	"$ClassName": "IerXVwr12Prm",
+	"$ClassVer": "12.7.9",
+	"$uid": "5d638a3e-c0f5-4223-ad22-07228270bdff",
+	"$stamp": "2025-08-04T12:46:03.481Z",
+	"APP": {
+		"ANAME": {
+			"ENG": "Viewer",
+			"FRA": "Visionneuse",
+			"GER": "Zuschauer",
+			"": "Viewer"
+		},
+		"ASID": "VWR12",
+		"AVER": "17.9.0",
+		"SRV": {
+			"XMSG": {
+				"PRM": "Message de l'APP",
+				"TYP": "VJSON",
+				"VAL": {}
+			}
+		}
+	},
+	"PRF": {
+		"PNAME": {
+			"FRA": "Documents",
+			"": "Documents"
+		},
+		"PPID": "XDO",
+		"PSID": "VWR0000323",
+		"PRM": {},
+		"SRV": {
+			"TITLE": {
+				"PRM": "#XPRM.APP.ASID# [#XPRM.PRF.ANAME#]",
+				"TYP": "VSTR",
+				"VAL": {}
+			},
+			"MNG_FILE": {
+				"PRM": "CDM",
+				"TYP": "VSTR",
+				"VAL": {}
+			},
+			"FORMATS": {
+				"PRM": "*",
+				"TYP": "VSTR",
+				"VAL": {}
+			},
+			"DSP_STATUS": {
+				"PRM": "*",
+				"TYP": "VSTR",
+				"VAL": {}
+			}
+		}
+	},
+	"USER": {
+		"APP": {
+			"EDM12": {
+				"PRF": {
+					"WSH-MNR": {},
+					"XRMWCON": {},
+					"MNR": {},
+					"WLM": {},
+					"BIS": {},
+					"AUS": {},
+					"BPC": {},
+					"BPR": {},
+					"CLL": {},
+					"CPY": {},
+					"CUR": {},
+					"DEP": {},
+					"EXA": {},
+					"FRM": {},
+					"GAS": {},
+					"INI": {},
+					"OFH": {},
+					"ONH": {},
+					"OPOD": {},
+					"PAY": {},
+					"PIH": {},
+					"POC": {},
+					"POM": {},
+					"RIV": {},
+					"SIH": {},
+					"WRK": {},
+					"XRMWETB": {},
+					"XRMWMAC": {},
+					"YBGI0": {},
+					"YCST": {},
+					"YDC": {},
+					"YDI": {},
+					"YMD": {},
+					"YPO": {},
+					"YRW": {},
+					"ZAH": {},
+					"ZAR": {},
+					"ZDL": {},
+					"ZEE": {},
+					"ZET": {},
+					"ZIN": {},
+					"ZKP": {},
+					"ZOF": {}
+				}
+			},
+			"EDV00": {
+				"PRF": {
+					"EVWX": {}
+				}
+			},
+			"EDX00": {
+				"PRF": {
+					"EURL": {},
+					"EHDL": {}
+				}
+			},
+			"EPS-WS": {
+				"PRF": {
+					"EDI": {},
+					"DUMMY": {},
+					"XDOC": {}
+				}
+			},
+			"GED-GWFUPL": {
+				"PRF": {
+					"ZOF": {},
+					"ZTE": {},
+					"POM": {}
+				}
+			},
+			"GED-BPCINV": {
+				"PRF": {
+					"INV2EDM": {}
+				}
+			},
+			"MAP00": {
+				"PRF": {
+					"XWAG": {}
+				}
+			},
+			"OLX12": {
+				"PRF": {
+					"ZOF": {},
+					"YPOH": {},
+					"YPO": {},
+					"POM": {},
+					"POH": {}
+				}
+			},
+			"VWR12": {
+				"PRF": {
+					"XDO": {}
+				}
+			},
+			"WAG12": {
+				"PRF": {
+					"WS-WAG": {}
+				}
+			},
+			"WRD12": {
+				"PRF": {
+					"ZOF": {}
+				}
+			},
+			"XGW00": {
+				"PRF": {
+					"EDMINV": {}
+				}
+			}
+		},
+		"LAN": ["FRA"],
+		"LANDEF": "FRA"
+	},
+	"MSG": {}
+}

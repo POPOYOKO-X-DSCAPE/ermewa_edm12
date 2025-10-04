@@ -1,0 +1,206 @@
+{
+	"$ClassName": "IerXEdmTree",
+	"$ClassVer": "12.7",
+	"$uid": "c390dfbb-7283-ebd2-b199-30f4f17acf3c",
+	"$stamp": "2025-10-01T13:28:34.164Z",
+	"headers": {
+		"login": "mzeghdoudi",
+		"uPid": "mzeghdoudi",
+		"uSid": "MZE0003953",
+		"xTree": "forest",
+		"xSid": "24000249-0002"
+	},
+	"xTree": {
+		"XOBJ": "MNR",
+		"XTYP": "REQ",
+		"SID": "24000249-0002",
+		"LEV": "0",
+		"ORD": "10",
+		"ROOT": "24000249",
+		"FATHER": "24000249",
+		"XSTA": "0",
+		"UUID": "7080f775-5cfd-574b-8276-326b55",
+		"CREDATTIM": "2024-05-30T13:10:22Z",
+		"CREUSR": "SOSAM",
+		"UPDDATTIM": "2024-05-30T13:10:22Z",
+		"UPDUSR": "JBARG",
+		"XREASON": "OP",
+		"XREASONFULL": "OP40",
+		"SOBJ": [
+			{
+				"XOBJ": "WRK",
+				"XTYP": "REQ",
+				"SID": "24000249-0003",
+				"LEV": "1",
+				"ORD": "10",
+				"ROOT": "24000249",
+				"FATHER": "24000249-0002",
+				"XSTA": "0",
+				"UUID": "db674d4f-562e-fc47-b5d4-979456",
+				"CREDATTIM": "2024-05-30T13:10:23Z",
+				"CREUSR": "SOSAM",
+				"UPDDATTIM": "2024-05-30T13:10:23Z",
+				"UPDUSR": "SOSAM",
+				"SOBJ": [],
+				"FDISPLAY": "ondemand",
+				"FLD": "WRK",
+				"FNAME": {
+					"ENG": { "DES": "Works Done" },
+					"FRA": { "DES": "Travaux réalisés" },
+					"": { "DES": "Works Done" }
+				}
+			},
+			{
+				"XOBJ": "POM",
+				"XTYP": "REQ",
+				"SID": "24000249-0004",
+				"LEV": "1",
+				"ORD": "20",
+				"ROOT": "24000249",
+				"FATHER": "24000249-0002",
+				"XSTA": "0",
+				"UUID": "d80b5671-07c2-f040-b3f3-ecf11e",
+				"CREDATTIM": "2024-05-30T13:11:19Z",
+				"CREUSR": "SOSAM",
+				"UPDDATTIM": "2024-05-30T13:11:19Z",
+				"UPDUSR": "SOSAM",
+				"SOBJ": [
+					{
+						"XOBJ": "OPO",
+						"XTYP": "ITV",
+						"SID": "24000249-0004/001",
+						"LEV": "3",
+						"ORD": "10",
+						"ROOT": "24000249",
+						"FATHER": "24000249-0004",
+						"XSTA": "N",
+						"UUID": "f1735278-b53f-4b4e-80c1-df0e12",
+						"CREDATTIM": "2024-05-30T13:11:23Z",
+						"CREUSR": "SOSAM",
+						"UPDDATTIM": "2024-05-30T13:11:23Z",
+						"UPDUSR": "SOSAM",
+						"SOBJ": [
+							{
+								"XOBJ": "OPOD",
+								"XTYP": "ITD",
+								"SID": "24000249-0004/001$MD3360",
+								"LEV": "4",
+								"ORD": "10",
+								"ROOT": "24000249",
+								"FATHER": "24000249-0004/001",
+								"XSTA": "N",
+								"UUID": "90bbe9ae-3f83-1a49-9318-f911b4",
+								"CREDATTIM": "2024-05-30T13:11:23Z",
+								"CREUSR": "SOSAM",
+								"UPDDATTIM": "2024-05-30T13:11:23Z",
+								"UPDUSR": "SOSAM",
+								"CODOPE": "MD3360",
+								"SOBJ": [],
+								"FDISPLAY": "ondemand",
+								"FLD": "MD3360",
+								"FNAME": {
+									"ENG": { "DES": "wagons for usecase OP (KU)" },
+									"FRA": { "DES": "wagons pour usecase OP (KU)" },
+									"GER": { "DES": "wagons usecase OP (KU)" },
+									"": { "DES": "wagons for usecase OP (KU)" }
+								}
+							},
+							{
+								"XOBJ": "OPOD",
+								"XTYP": "ITD",
+								"SID": "24000249-0004/001$NETI",
+								"LEV": "4",
+								"ORD": "20",
+								"ROOT": "24000249",
+								"FATHER": "24000249-0004/001",
+								"XSTA": "N",
+								"UUID": "ca115007-05d7-b340-b2a4-166164",
+								"CREDATTIM": "2024-05-30T13:11:23Z",
+								"CREUSR": "SOSAM",
+								"UPDDATTIM": "2024-05-30T13:11:23Z",
+								"UPDUSR": "SOSAM",
+								"CODOPE": "NETI",
+								"SOBJ": [],
+								"FDISPLAY": "ondemand",
+								"FLD": "NETI",
+								"FNAME": {
+									"ENG": { "DES": "Internal cleaning standard wagon" },
+									"FRA": { "DES": "Nettoyage intérieur wg standar" },
+									"GER": { "DES": "Innenreinigung Standardwagen" },
+									"": { "DES": "Internal cleaning standard wagon" }
+								}
+							},
+							{
+								"XOBJ": "OPOD",
+								"XTYP": "ITD",
+								"SID": "24000249-0004/001$",
+								"LEV": "4",
+								"ORD": "30",
+								"ROOT": "24000249",
+								"FATHER": "24000249-0004/001",
+								"XSTA": "N",
+								"UUID": "48255640-81a9-c543-81f4-3a863b",
+								"CREDATTIM": "2024-05-30T13:11:23Z",
+								"CREUSR": "SOSAM",
+								"UPDDATTIM": "2024-05-30T13:11:23Z",
+								"UPDUSR": "SOSAM",
+								"SOBJ": [],
+								"FDISPLAY": "ondemand",
+								"FLD": "",
+								"FNAME": {
+									"FRA": { "DES": "" },
+									"": { "DES": "" }
+								}
+							}
+						],
+						"FDISPLAY": "ondemand",
+						"FLD": "OPO",
+						"FNAME": {
+							"FRA": {
+								"DES": "OP Order Management",
+								"SHO": "OP order Mng"
+							},
+							"": {
+								"DES": "OP Order Management",
+								"SHO": "OP order Mng"
+							}
+						}
+					}
+				],
+				"FDISPLAY": "ondemand",
+				"FLD": "POM",
+				"FNAME": {
+					"ENG": { "DES": "Purchase Order Management" },
+					"FRA": { "DES": "Gestion Commandes d'achat" },
+					"": { "DES": "Purchase Order Management" }
+				}
+			}
+		],
+		"XLNK": {
+			"XMAC01": {
+				"X3OBJ": "XMAC01",
+				"XTYP": "MAC",
+				"SID": "000211",
+				"VID": "WAG$000211$1",
+				"DID": "338078365651",
+				"FID": "33 80 783 6 565 1",
+				"FMT": "2X[ ]2X[ ]3X[ ]X[ ]3X[ ]X",
+				"ITMREF": "WAGON",
+				"MACTYP": "OIL",
+				"STATITM": "LXO",
+				"YHI00": "338078365651",
+				"YHI00FMT": "33 80 783 6 565 1"
+			}
+		},
+		"FDISPLAY": { "FLD": true, "SID": true },
+		"FLD": "MNR",
+		"FNAME": {
+			"ENG": { "DES": "Maintenance & Repair", "SHO": "MaintRepara" },
+			"FRA": {
+				"DES": "Maintenance & Réparation",
+				"SHO": "MaintRepara"
+			},
+			"": { "DES": "Maintenance & Repair", "SHO": "MaintRepara" }
+		}
+	}
+}

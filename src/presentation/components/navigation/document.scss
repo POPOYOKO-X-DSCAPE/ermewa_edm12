@@ -1,0 +1,129 @@
+@import "../../../variables.scss";
+@import "./nav-element.scss";
+
+@keyframes afterFadein {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+
+    90% {
+        width: 3px;
+        height: 120%;
+        opacity: 1;
+    }
+
+    100% {
+        width: 1px;
+        height: 100%;
+        opacity: 1;
+        box-shadow: $primary 0px 48px 100px 0px;
+    }
+}
+
+@keyframes stripes {
+    from {
+        opacity: 0;
+        background-position-x: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    to {
+        background-position-x: 100px;
+        opacity: 0;
+    }
+}
+
+.document-node {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    min-height: $clickzone-min-size;
+    background-color: $bg-interaction-initial;
+    color: $fg-interaction-initial;
+    gap: $spacing-base*2;
+    position: relative;
+    cursor: pointer;
+    padding: $padding-base;
+    font-weight: 400;
+
+    &:hover {
+        background-color: $bg-elevated-hover;
+    }
+
+    &.active {
+        font-weight: 600;
+        padding-left: $spacing-base*4;
+        background-color: $bg-interaction-active;
+        color: $fg-interaction-active;
+        @include inner-shadow;
+
+        &::after {
+            animation: afterFadein;
+            animation-duration: 0.15s;
+            animation-timing-function: ease-in;
+            content: "";
+            width: $sizing-base;
+            height: 100%;
+            background-color: $fg-interaction-active;
+            border-radius: $radius-base/2;
+            opacity: 70%;
+        }
+    }
+
+    .document-status {
+        height: $sizing-base*3;
+        width: $sizing-base*3;
+        background-color: grey;
+        border-radius: 50%;
+        border: $border-base solid $fg-action-initial;
+    }
+
+    .actions {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: $spacing-base;
+    }
+
+    .flag {
+        z-index: 3;
+        font-size: 10px;
+        padding: $padding-base/2 $padding-base;
+        background-color: $yellow;
+        color: $black;
+        position: absolute;
+        bottom: 0;
+        left: $spacing-base*8;
+        transform: translate(0%, 50%);
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        gap: $spacing-base*4;
+        overflow: hidden;
+
+        .wip {
+            display: block;
+            height: $sizing-base*3;
+            aspect-ratio: 1/1;
+            border-radius: 100%;
+            background-color: $yellow;
+            animation: stripes infinite 4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background-size: 200%;
+            background: repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent $sizing-base,
+                    $black $sizing-base,
+                    $black $sizing-base*2);
+        }
+    }
+
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+}

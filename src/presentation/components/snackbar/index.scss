@@ -1,0 +1,42 @@
+@import "../../../../variables.scss";
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translate(0, 50px);
+        /* Démarre en bas */
+    }
+
+    80% {
+        opacity: 1;
+        transform: translate(0, -10px);
+        /* Finit à sa position initiale */
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(0, 0);
+        /* Finit à sa position initiale */
+    }
+}
+
+.snackbar {
+    position: fixed;
+    bottom: $spacing-base * 4;
+    right: $spacing-base * 4;
+    background-color: $bg-info-initial;
+    color: $fg-info-initial;
+    border: none;
+    outline: none;
+    min-height: 44px;
+    min-width: 44px;
+    padding: $padding-base * 2;
+    animation: fadeInUp 0.5s ease;
+    cursor: pointer;
+    border-radius: $radius-base;
+
+    &:hover {
+        background-color: $bg-info-hover;
+        color: $fg-info-initial;
+    }
+}

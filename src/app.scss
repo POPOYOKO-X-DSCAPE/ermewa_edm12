@@ -1,0 +1,128 @@
+@use "sass:color";
+@import "./main.scss";
+
+#app {
+  @include font-family-body;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+  height: 100vh;
+  overflow: hidden;
+
+  .app-header {
+    display: flex;
+    background-color: $bg-elevated-initial;
+    padding: $sizing-base * 4;
+    align-items: center;
+    gap: $spacing-base * 4;
+    border-bottom: 1px solid color.adjust($color: $fg-elevated-initial, $alpha: -0.9%);
+    @include elevated-shadow;
+    z-index: 2;
+
+    .app-name {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: $spacing-base * 8;
+      @include font-family-head;
+
+      h1 {
+        margin: 0;
+        font-size: 20px;
+        display: flex;
+        flex-direction: column;
+
+        span {
+          font-size: medium;
+          font-size: 12px;
+        }
+
+        .version {
+          color: $primary;
+        }
+      }
+    }
+
+    .wagon {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 16px;
+      gap: $sizing-base * 2;
+      padding: $padding-base $padding-base * 2;
+      border-radius: $radius-base;
+      background-color: $bg-default-initial;
+      @include font-family-head;
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .right {
+      margin-left: auto;
+      display: flex;
+      flex-direction: row;
+      gap: $spacing-base;
+
+      button {
+        background-color: unset;
+        border: $fg-default-initial 1px solid;
+        color: $fg-default-initial;
+
+        &:hover {
+          background-color: rgba($color: #000000, $alpha: 0.1);
+        }
+      }
+
+      .logged-user {
+        aspect-ratio: 1 / 1;
+        display: flex;
+        gap: $sizing-base * 4;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-weight: bolder;
+        text-transform: uppercase;
+        @include font-family-head;
+        background-color: $bg-action-initial;
+        color: $fg-action-initial;
+        padding: $padding-base;
+        border-radius: $radius-base;
+      }
+    }
+  }
+
+  main {
+    display: flex;
+    flex-grow: 1;
+    position: relative;
+    justify-content: stretch;
+    align-items: stretch;
+    height: 90%;
+    background-color: $bg-interaction-initial;
+    overflow: hidden;
+
+    nav {
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      max-height: 100%;
+      flex-grow: 1;
+      @include inner-shadow;
+      border-radius: $radius-base * 2 0 0 0;
+      background-color: $bg-default-initial;
+      overflow: hidden;
+    }
+  }
+}

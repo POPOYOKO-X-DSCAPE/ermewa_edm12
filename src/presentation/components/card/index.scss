@@ -1,0 +1,11 @@
+@import "../../../../variables.scss";
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: $bg-elevated-initial;
+    padding: $padding-base*4;
+    border-radius: $radius-base*2;
+    gap: $spacing-base*4;
+}

@@ -1,0 +1,86 @@
+@import "../../../../variables.scss";
+
+.sync-table {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  height: 100%;
+
+  .table-wrapper {
+    flex-grow: 1;
+    background-color: black;
+
+    table {
+      width: 100%;
+      table-layout: fixed;
+      border-spacing: 0 10px;
+
+      thead {
+        th {
+          border-bottom: solid white 1px;
+          font-weight: lighter;
+        }
+      }
+
+      tbody {
+        tr {
+          td {
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: smaller;
+            padding: 0px 4px;
+          }
+        }
+      }
+    }
+  }
+
+  .notifcation {
+    flex-shrink: 1;
+    border-top: solid white 1px;
+    padding: 4px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+
+    .sync-button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+
+      svg {
+        height: 40px;
+        width: 40px;
+
+        &:hover {
+          animation: rotate 10s linear infinite;
+        }
+      }
+    }
+  }
+
+  &.closed {
+    .table-wrapper {
+      display: none;
+    }
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

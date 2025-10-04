@@ -1,0 +1,44 @@
+@import "../../../variables.scss";
+
+.icon {
+    display: flex;
+
+    &.small {
+        width: 16px;
+        height: 16px;
+        font-size: 14px;
+    }
+
+    &.medium {
+        width: 24px;
+        height: 24px;
+        font-size: 24px;
+    }
+
+    &.large {
+        width: 32px;
+        height: 32px;
+        font-size: 32px;
+    }
+}
+
+.document-extension {
+    position: relative;
+
+    .extension-name {
+        transform: translate(-50%, -50%);
+        position: absolute;
+        text-transform: uppercase;
+        color: #fff;
+        font-size: 25%;
+        line-height: 0;
+        bottom: 32%;
+        left: 45%;
+        text-align: center;
+        @include font-family-head;
+    }
+
+    svg {
+        width: 100%;
+    }
+}
