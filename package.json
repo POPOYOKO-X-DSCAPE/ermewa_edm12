@@ -4,10 +4,6 @@
 	"version": "0.0.0",
 	"type": "module",
 	"workspaces": ["packages/*"],
-	"repository": {
-		"type": "github",
-		"url": "git@github.com:test.git"
-	},
 	"scripts": {
 		"dev": "bunx --bun vite --port 3000",
 		"preview": "vite preview",

@@ -755,17 +755,21 @@ const tokens = {
     "value": "16px",
     "variable": "var(--spacing-c\\.header-padding)"
   },
-  "spacing.c.sidebar.element.padding.initial": {
+  "spacing.c.sidebar.element.gap": {
     "value": "8px",
-    "variable": "var(--spacing-c\\.sidebar-element-padding-initial)"
+    "variable": "var(--spacing-c\\.sidebar-element-gap)"
   },
-  "spacing.c.sidebar.element.paddingX.intial": {
+  "spacing.c.sidebar.element.padding": {
+    "value": "8px",
+    "variable": "var(--spacing-c\\.sidebar-element-padding)"
+  },
+  "spacing.c.sidebar.element.paddingX": {
     "value": "16px",
-    "variable": "var(--spacing-c\\.sidebar-element-padding-x-intial)"
+    "variable": "var(--spacing-c\\.sidebar-element-padding-x)"
   },
-  "spacing.c.sidebar.groupChildren.paddingLeft.initial": {
+  "spacing.c.sidebar.groupChildren.paddingLeft": {
     "value": "28px",
-    "variable": "var(--spacing-c\\.sidebar-group-children-padding-left-initial)"
+    "variable": "var(--spacing-c\\.sidebar-group-children-padding-left)"
   },
   "spacing.c.documentViewer.padding": {
     "value": "16px",
@@ -987,17 +991,21 @@ const tokens = {
     "value": "calc(var(--spacing-c\\.header-padding) * -1)",
     "variable": "var(--spacing-c\\.header-padding)"
   },
-  "spacing.c.sidebar.element.padding.-initial": {
-    "value": "calc(var(--spacing-c\\.sidebar-element-padding-initial) * -1)",
-    "variable": "var(--spacing-c\\.sidebar-element-padding-initial)"
+  "spacing.c.sidebar.element.-gap": {
+    "value": "calc(var(--spacing-c\\.sidebar-element-gap) * -1)",
+    "variable": "var(--spacing-c\\.sidebar-element-gap)"
   },
-  "spacing.c.sidebar.element.paddingX.-intial": {
-    "value": "calc(var(--spacing-c\\.sidebar-element-padding-x-intial) * -1)",
-    "variable": "var(--spacing-c\\.sidebar-element-padding-x-intial)"
+  "spacing.c.sidebar.element.-padding": {
+    "value": "calc(var(--spacing-c\\.sidebar-element-padding) * -1)",
+    "variable": "var(--spacing-c\\.sidebar-element-padding)"
   },
-  "spacing.c.sidebar.groupChildren.paddingLeft.-initial": {
-    "value": "calc(var(--spacing-c\\.sidebar-group-children-padding-left-initial) * -1)",
-    "variable": "var(--spacing-c\\.sidebar-group-children-padding-left-initial)"
+  "spacing.c.sidebar.element.-paddingX": {
+    "value": "calc(var(--spacing-c\\.sidebar-element-padding-x) * -1)",
+    "variable": "var(--spacing-c\\.sidebar-element-padding-x)"
+  },
+  "spacing.c.sidebar.groupChildren.-paddingLeft": {
+    "value": "calc(var(--spacing-c\\.sidebar-group-children-padding-left) * -1)",
+    "variable": "var(--spacing-c\\.sidebar-group-children-padding-left)"
   },
   "spacing.c.documentViewer.-padding": {
     "value": "calc(var(--spacing-c\\.document-viewer-padding) * -1)",

@@ -412,9 +412,10 @@
     --colors-c\.snackbar-bg: #fafafa;
     --colors-c\.snackbar-fg: #0b0b0b;
     --spacing-c\.header-padding: 16px;
-    --spacing-c\.sidebar-element-padding-initial: 8px;
-    --spacing-c\.sidebar-element-padding-x-intial: 16px;
-    --spacing-c\.sidebar-group-children-padding-left-initial: 28px;
+    --spacing-c\.sidebar-element-gap: 8px;
+    --spacing-c\.sidebar-element-padding: 8px;
+    --spacing-c\.sidebar-element-padding-x: 16px;
+    --spacing-c\.sidebar-group-children-padding-left: 28px;
     --spacing-c\.document-viewer-padding: 16px;
     --spacing-c\.document-viewer-gap: 16px;
     --spacing-c\.document-viewer-zoom-gap: 8px;
