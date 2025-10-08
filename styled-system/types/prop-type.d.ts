@@ -165,7 +165,7 @@ export interface UtilityValues {
 	srOnly: boolean;
 	debug: boolean;
 	containerName: CssProperties["containerName"];
-	colorPalette: "b" | "b.primary" | "b.primary.shades" | "b.primary.scales" | "b.grey" | "b.grey.shades" | "b.grey.scales" | "b.infoScale" | "b.yellowScale" | "s" | "s.bg" | "s.bg.default" | "s.bg.elevated" | "s.bg.actionLow" | "s.bg.actionHigh" | "s.fg" | "s.fg.default" | "s.fg.elevated" | "s.fg.actionLow" | "s.fg.actionHigh" | "c.app" | "c.header" | "c.sidebar" | "c.sidebar.bg" | "c.sidebar.fg" | "c.sidebar.element" | "c.sidebar.element.bg" | "c.sidebar.element.fg" | "c.documentViewer" | "c.buttonPrimary" | "c.buttonPrimary.bg" | "c.buttonPrimary.fg" | "c.buttonSecondary" | "c.buttonSecondary.bg" | "c.buttonSecondary.fg" | "c.snackbar";
+	colorPalette: "b" | "b.primary" | "b.primary.shades" | "b.primary.scales" | "b.grey" | "b.grey.shades" | "b.grey.scales" | "b.infoScale" | "b.yellowScale" | "s" | "s.bg" | "s.bg.default" | "s.bg.elevated" | "s.bg.actionLow" | "s.bg.actionHigh" | "s.fg" | "s.fg.default" | "s.fg.elevated" | "s.fg.actionLow" | "s.fg.actionHigh" | "c.app" | "c.header" | "c.sidebar" | "c.sidebar.bg" | "c.sidebar.fg" | "c.sidebar.element" | "c.sidebar.element.bg" | "c.sidebar.element.fg" | "c.documentViewer" | "c.buttonPrimary" | "c.buttonPrimary.bg" | "c.buttonPrimary.fg" | "c.buttonSecondary" | "c.buttonSecondary.bg" | "c.buttonSecondary.fg" | "c.buttonMenu" | "c.buttonMenu.bg" | "c.buttonMenu.fg" | "c.buttonMenuItem" | "c.buttonMenuItem.bg" | "c.buttonMenuItem.fg" | "c.snackbar" | "c.inputLabel" | "c.input";
 }
 
 

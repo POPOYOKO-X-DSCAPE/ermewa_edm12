@@ -297,6 +297,7 @@
     --colors-s-bg-default-hover: #0b0b0b;
     --colors-s-bg-elevated-initial: #fafafa;
     --colors-s-bg-elevated-hover: #eeeeee;
+    --colors-s-bg-elevated-active: #8888881a;
     --colors-s-bg-action-low-initial: #eeeeee;
     --colors-s-bg-action-low-hover: #d6d6d6;
     --colors-s-bg-action-high-initial: #273dffff;
@@ -397,6 +398,7 @@
     --colors-c\.sidebar-fg-initial: #0b0b0b;
     --colors-c\.sidebar-element-bg-initial: #fafafa;
     --colors-c\.sidebar-element-bg-hover: #eeeeee;
+    --colors-c\.sidebar-element-bg-active: #8888881a;
     --colors-c\.sidebar-element-fg-initial: #0b0b0b;
     --colors-c\.sidebar-element-fg-hover: #181818;
     --colors-c\.document-viewer-bg: #fafafa;
@@ -409,20 +411,38 @@
     --colors-c\.button-secondary-bg-hover: #d6d6d6;
     --colors-c\.button-secondary-fg-initial: #273dffff;
     --colors-c\.button-secondary-fg-hover: #0023df;
+    --colors-c\.button-menu-bg-initial: #fafafa;
+    --colors-c\.button-menu-bg-hover: #eeeeee;
+    --colors-c\.button-menu-fg-initial: #0b0b0b;
+    --colors-c\.button-menu-fg-hover: #181818;
+    --colors-c\.button-menu-item-bg-initial: #eeeeee;
+    --colors-c\.button-menu-item-bg-hover: #d6d6d6;
+    --colors-c\.button-menu-item-fg-initial: #273dffff;
+    --colors-c\.button-menu-item-fg-hover: #0023df;
     --colors-c\.snackbar-bg: #fafafa;
     --colors-c\.snackbar-fg: #0b0b0b;
+    --colors-c\.input-label-color: #0b0b0b;
+    --colors-c\.input-bg: #eeeeee;
+    --colors-c\.input-fg: #0b0b0b;
     --spacing-c\.header-padding: 16px;
     --spacing-c\.sidebar-element-gap: 8px;
     --spacing-c\.sidebar-element-padding: 8px;
-    --spacing-c\.sidebar-element-padding-x: 16px;
+    --spacing-c\.sidebar-element-padding-left: 16px;
     --spacing-c\.sidebar-group-children-padding-left: 28px;
     --spacing-c\.document-viewer-padding: 16px;
     --spacing-c\.document-viewer-gap: 16px;
     --spacing-c\.document-viewer-zoom-gap: 8px;
     --spacing-c\.button-primary-padding: 12px;
+    --spacing-c\.button-primary-gap: 4px;
     --spacing-c\.button-secondary-padding: 12px;
+    --spacing-c\.button-secondary-gap: 4px;
+    --spacing-c\.button-menu-padding: 12px;
+    --spacing-c\.button-menu-item-padding: 12px;
+    --spacing-c\.button-menu-item-gap: 4px;
     --spacing-c\.snackbar-padding: 20px;
     --spacing-c\.snackbar-margin: 14px;
+    --spacing-c\.input-container-gap: 4px;
+    --spacing-c\.input-padding: 8px;
     --font-sizes-c\.app-h1: 1.4em;
     --font-sizes-c\.app-h2: 1.3em;
     --font-sizes-c\.app-h3: 1.2em;
@@ -435,8 +455,12 @@
     --font-weights-c\.app-h4: 400;
     --font-weights-c\.app-h5: 400;
     --font-weights-c\.app-h6: 400;
+    --radii-c\.sidebar-element-radius: 3px;
     --radii-c\.button-primary-radius: 2px;
     --radii-c\.button-secondary-radius: 2px;
+    --radii-c\.button-menu-radius: 2px;
+    --radii-c\.button-menu-item-radius: 2px;
     --radii-c\.snackbar-radius: 3px;
+    --radii-c\.input-radius: 1px;
 }
 }

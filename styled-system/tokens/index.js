@@ -295,6 +295,10 @@ const tokens = {
     "value": "#eeeeee",
     "variable": "var(--colors-s-bg-elevated-hover)"
   },
+  "colors.s.bg.elevated.active": {
+    "value": "#8888881a",
+    "variable": "var(--colors-s-bg-elevated-active)"
+  },
   "colors.s.bg.actionLow.initial": {
     "value": "#eeeeee",
     "variable": "var(--colors-s-bg-action-low-initial)"
@@ -695,6 +699,10 @@ const tokens = {
     "value": "#eeeeee",
     "variable": "var(--colors-c\\.sidebar-element-bg-hover)"
   },
+  "colors.c.sidebar.element.bg.active": {
+    "value": "#8888881a",
+    "variable": "var(--colors-c\\.sidebar-element-bg-active)"
+  },
   "colors.c.sidebar.element.fg.initial": {
     "value": "#0b0b0b",
     "variable": "var(--colors-c\\.sidebar-element-fg-initial)"
@@ -743,6 +751,38 @@ const tokens = {
     "value": "#0023df",
     "variable": "var(--colors-c\\.button-secondary-fg-hover)"
   },
+  "colors.c.buttonMenu.bg.initial": {
+    "value": "#fafafa",
+    "variable": "var(--colors-c\\.button-menu-bg-initial)"
+  },
+  "colors.c.buttonMenu.bg.hover": {
+    "value": "#eeeeee",
+    "variable": "var(--colors-c\\.button-menu-bg-hover)"
+  },
+  "colors.c.buttonMenu.fg.initial": {
+    "value": "#0b0b0b",
+    "variable": "var(--colors-c\\.button-menu-fg-initial)"
+  },
+  "colors.c.buttonMenu.fg.hover": {
+    "value": "#181818",
+    "variable": "var(--colors-c\\.button-menu-fg-hover)"
+  },
+  "colors.c.buttonMenuItem.bg.initial": {
+    "value": "#eeeeee",
+    "variable": "var(--colors-c\\.button-menu-item-bg-initial)"
+  },
+  "colors.c.buttonMenuItem.bg.hover": {
+    "value": "#d6d6d6",
+    "variable": "var(--colors-c\\.button-menu-item-bg-hover)"
+  },
+  "colors.c.buttonMenuItem.fg.initial": {
+    "value": "#273dffff",
+    "variable": "var(--colors-c\\.button-menu-item-fg-initial)"
+  },
+  "colors.c.buttonMenuItem.fg.hover": {
+    "value": "#0023df",
+    "variable": "var(--colors-c\\.button-menu-item-fg-hover)"
+  },
   "colors.c.snackbar.bg": {
     "value": "#fafafa",
     "variable": "var(--colors-c\\.snackbar-bg)"
@@ -750,6 +790,18 @@ const tokens = {
   "colors.c.snackbar.fg": {
     "value": "#0b0b0b",
     "variable": "var(--colors-c\\.snackbar-fg)"
+  },
+  "colors.c.inputLabel.color": {
+    "value": "#0b0b0b",
+    "variable": "var(--colors-c\\.input-label-color)"
+  },
+  "colors.c.input.bg": {
+    "value": "#eeeeee",
+    "variable": "var(--colors-c\\.input-bg)"
+  },
+  "colors.c.input.fg": {
+    "value": "#0b0b0b",
+    "variable": "var(--colors-c\\.input-fg)"
   },
   "spacing.c.header.padding": {
     "value": "16px",
@@ -763,9 +815,9 @@ const tokens = {
     "value": "8px",
     "variable": "var(--spacing-c\\.sidebar-element-padding)"
   },
-  "spacing.c.sidebar.element.paddingX": {
+  "spacing.c.sidebar.element.paddingLeft": {
     "value": "16px",
-    "variable": "var(--spacing-c\\.sidebar-element-padding-x)"
+    "variable": "var(--spacing-c\\.sidebar-element-padding-left)"
   },
   "spacing.c.sidebar.groupChildren.paddingLeft": {
     "value": "28px",
@@ -787,9 +839,29 @@ const tokens = {
     "value": "12px",
     "variable": "var(--spacing-c\\.button-primary-padding)"
   },
+  "spacing.c.buttonPrimary.gap": {
+    "value": "4px",
+    "variable": "var(--spacing-c\\.button-primary-gap)"
+  },
   "spacing.c.buttonSecondary.padding": {
     "value": "12px",
     "variable": "var(--spacing-c\\.button-secondary-padding)"
+  },
+  "spacing.c.buttonSecondary.gap": {
+    "value": "4px",
+    "variable": "var(--spacing-c\\.button-secondary-gap)"
+  },
+  "spacing.c.buttonMenu.padding": {
+    "value": "12px",
+    "variable": "var(--spacing-c\\.button-menu-padding)"
+  },
+  "spacing.c.buttonMenuItem.padding": {
+    "value": "12px",
+    "variable": "var(--spacing-c\\.button-menu-item-padding)"
+  },
+  "spacing.c.buttonMenuItem.gap": {
+    "value": "4px",
+    "variable": "var(--spacing-c\\.button-menu-item-gap)"
   },
   "spacing.c.snackbar.padding": {
     "value": "20px",
@@ -798,6 +870,14 @@ const tokens = {
   "spacing.c.snackbar.margin": {
     "value": "14px",
     "variable": "var(--spacing-c\\.snackbar-margin)"
+  },
+  "spacing.c.inputContainer.gap": {
+    "value": "4px",
+    "variable": "var(--spacing-c\\.input-container-gap)"
+  },
+  "spacing.c.input.padding": {
+    "value": "8px",
+    "variable": "var(--spacing-c\\.input-padding)"
   },
   "fontSizes.c.app.h1": {
     "value": "1.4em",
@@ -847,6 +927,10 @@ const tokens = {
     "value": "400",
     "variable": "var(--font-weights-c\\.app-h6)"
   },
+  "radii.c.sidebar.element.radius": {
+    "value": "3px",
+    "variable": "var(--radii-c\\.sidebar-element-radius)"
+  },
   "radii.c.buttonPrimary.radius": {
     "value": "2px",
     "variable": "var(--radii-c\\.button-primary-radius)"
@@ -855,9 +939,21 @@ const tokens = {
     "value": "2px",
     "variable": "var(--radii-c\\.button-secondary-radius)"
   },
+  "radii.c.buttonMenu.radius": {
+    "value": "2px",
+    "variable": "var(--radii-c\\.button-menu-radius)"
+  },
+  "radii.c.buttonMenuItem.radius": {
+    "value": "2px",
+    "variable": "var(--radii-c\\.button-menu-item-radius)"
+  },
   "radii.c.snackbar.radius": {
     "value": "3px",
     "variable": "var(--radii-c\\.snackbar-radius)"
+  },
+  "radii.c.input.radius": {
+    "value": "1px",
+    "variable": "var(--radii-c\\.input-radius)"
   },
   "spacing.b.padding.-none": {
     "value": "calc(var(--spacing-b-padding-none) * -1)",
@@ -999,9 +1095,9 @@ const tokens = {
     "value": "calc(var(--spacing-c\\.sidebar-element-padding) * -1)",
     "variable": "var(--spacing-c\\.sidebar-element-padding)"
   },
-  "spacing.c.sidebar.element.-paddingX": {
-    "value": "calc(var(--spacing-c\\.sidebar-element-padding-x) * -1)",
-    "variable": "var(--spacing-c\\.sidebar-element-padding-x)"
+  "spacing.c.sidebar.element.-paddingLeft": {
+    "value": "calc(var(--spacing-c\\.sidebar-element-padding-left) * -1)",
+    "variable": "var(--spacing-c\\.sidebar-element-padding-left)"
   },
   "spacing.c.sidebar.groupChildren.-paddingLeft": {
     "value": "calc(var(--spacing-c\\.sidebar-group-children-padding-left) * -1)",
@@ -1023,9 +1119,29 @@ const tokens = {
     "value": "calc(var(--spacing-c\\.button-primary-padding) * -1)",
     "variable": "var(--spacing-c\\.button-primary-padding)"
   },
+  "spacing.c.buttonPrimary.-gap": {
+    "value": "calc(var(--spacing-c\\.button-primary-gap) * -1)",
+    "variable": "var(--spacing-c\\.button-primary-gap)"
+  },
   "spacing.c.buttonSecondary.-padding": {
     "value": "calc(var(--spacing-c\\.button-secondary-padding) * -1)",
     "variable": "var(--spacing-c\\.button-secondary-padding)"
+  },
+  "spacing.c.buttonSecondary.-gap": {
+    "value": "calc(var(--spacing-c\\.button-secondary-gap) * -1)",
+    "variable": "var(--spacing-c\\.button-secondary-gap)"
+  },
+  "spacing.c.buttonMenu.-padding": {
+    "value": "calc(var(--spacing-c\\.button-menu-padding) * -1)",
+    "variable": "var(--spacing-c\\.button-menu-padding)"
+  },
+  "spacing.c.buttonMenuItem.-padding": {
+    "value": "calc(var(--spacing-c\\.button-menu-item-padding) * -1)",
+    "variable": "var(--spacing-c\\.button-menu-item-padding)"
+  },
+  "spacing.c.buttonMenuItem.-gap": {
+    "value": "calc(var(--spacing-c\\.button-menu-item-gap) * -1)",
+    "variable": "var(--spacing-c\\.button-menu-item-gap)"
   },
   "spacing.c.snackbar.-padding": {
     "value": "calc(var(--spacing-c\\.snackbar-padding) * -1)",
@@ -1034,6 +1150,14 @@ const tokens = {
   "spacing.c.snackbar.-margin": {
     "value": "calc(var(--spacing-c\\.snackbar-margin) * -1)",
     "variable": "var(--spacing-c\\.snackbar-margin)"
+  },
+  "spacing.c.inputContainer.-gap": {
+    "value": "calc(var(--spacing-c\\.input-container-gap) * -1)",
+    "variable": "var(--spacing-c\\.input-container-gap)"
+  },
+  "spacing.c.input.-padding": {
+    "value": "calc(var(--spacing-c\\.input-padding) * -1)",
+    "variable": "var(--spacing-c\\.input-padding)"
   },
   "colors.colorPalette.black": {
     "value": "var(--colors-color-palette-black)",
@@ -1487,6 +1611,18 @@ const tokens = {
     "value": "var(--colors-color-palette-elevated-hover)",
     "variable": "var(--colors-color-palette-elevated-hover)"
   },
+  "colors.colorPalette.bg.elevated.active": {
+    "value": "var(--colors-color-palette-bg-elevated-active)",
+    "variable": "var(--colors-color-palette-bg-elevated-active)"
+  },
+  "colors.colorPalette.elevated.active": {
+    "value": "var(--colors-color-palette-elevated-active)",
+    "variable": "var(--colors-color-palette-elevated-active)"
+  },
+  "colors.colorPalette.active": {
+    "value": "var(--colors-color-palette-active)",
+    "variable": "var(--colors-color-palette-active)"
+  },
   "colors.colorPalette.bg.actionLow.initial": {
     "value": "var(--colors-color-palette-bg-action-low-initial)",
     "variable": "var(--colors-color-palette-bg-action-low-initial)"
@@ -1579,6 +1715,14 @@ const tokens = {
     "value": "var(--colors-color-palette-element-bg-hover)",
     "variable": "var(--colors-color-palette-element-bg-hover)"
   },
+  "colors.colorPalette.element.bg.active": {
+    "value": "var(--colors-color-palette-element-bg-active)",
+    "variable": "var(--colors-color-palette-element-bg-active)"
+  },
+  "colors.colorPalette.bg.active": {
+    "value": "var(--colors-color-palette-bg-active)",
+    "variable": "var(--colors-color-palette-bg-active)"
+  },
   "colors.colorPalette.element.fg.initial": {
     "value": "var(--colors-color-palette-element-fg-initial)",
     "variable": "var(--colors-color-palette-element-fg-initial)"
@@ -1590,6 +1734,10 @@ const tokens = {
   "colors.colorPalette.fg.hover": {
     "value": "var(--colors-color-palette-fg-hover)",
     "variable": "var(--colors-color-palette-fg-hover)"
+  },
+  "colors.colorPalette.color": {
+    "value": "var(--colors-color-palette-color)",
+    "variable": "var(--colors-color-palette-color)"
   }
 }
 
