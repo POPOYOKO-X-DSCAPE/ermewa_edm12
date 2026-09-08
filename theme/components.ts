@@ -19,8 +19,6 @@ import {
 	inputFocus as kitInputFocus,
 	inputLabel as kitInputLabel,
 } from "@packages/ui/theme/components/form/input/tokens";
-import { header as kitHeader } from "@packages/ui/theme/components/header/tokens";
-import { sidebar as kitSidebar } from "@packages/ui/theme/components/sidebar/tokens";
 import { snackbar as kitSnackbar } from "@packages/ui/theme/components/snackbar/tokens";
 import { defineTokens } from "@pandacss/dev";
 
@@ -64,36 +62,6 @@ export const components = {
 		colors: {
 			bg: ref("s.bg.default.initial"),
 			fg: ref("s.fg.default.initial"),
-		},
-	}),
-	header: defineTokens({
-		...kitHeader,
-		colors: elevatedColors(),
-	}),
-	sidebar: defineTokens({
-		...kitSidebar,
-		colors: {
-			bg: {
-				initial: ref("s.bg.elevated.initial"),
-				hover: ref("s.bg.elevated.hover"),
-			},
-			fg: { initial: ref("s.fg.elevated.initial") },
-			border: {
-				// Keep the pre-tokenization sidebar group guide color (#3333).
-				guide: { value: "#3333" },
-			},
-			element: {
-				bg: {
-					initial: ref("s.bg.elevated.initial"),
-					hover: ref("s.bg.elevated.hover"),
-					active: ref("s.bg.elevated.active"),
-				},
-				fg: {
-					initial: ref("s.fg.elevated.initial"),
-					hover: ref("s.fg.elevated.hover"),
-					active: ref("s.fg.elevated.active"),
-				},
-			},
 		},
 	}),
 	documentViewer: defineTokens({
