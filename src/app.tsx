@@ -1,284 +1,564 @@
-import { useEffect, useMemo, useState } from "react";
-
-import classNames from "classnames";
-
-import type { DisplaySelectParameterInterface } from "./domain/types";
-
-import { useAppContext } from "./presentation/contexts/app-context";
+import { HeadingLevel } from "@ariakit/react";
 import {
-  PersisterContextProvider,
-  usePersisterContext,
-} from "./presentation/contexts/persister-context";
+	Suspense,
+	lazy,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
+import { useLocation } from "react-router-dom";
 
-import useDocument from "./presentation/hooks/use-document";
-import usePDFActionsStatus from "./presentation/hooks/use-pdf-actions-status";
-import useViewerProps from "./presentation/hooks/use-viewer-props";
+import { App, Loadable, Stack, useLoadable } from "@packages/ui";
 
-// import { DocumentViewer } from "./presentation/components/document-viewer";
+import { createComponent } from "./core/component.builder";
+import { api } from "./infrastructure/services/raw.api";
+import { AppHeader } from "./presentation/view/components/app-header";
+import { DocumentViewerSlot } from "./presentation/view/components/document-viewer-slot";
+import { SideBar } from "./presentation/view/components/side-bar";
+
 import { Loader } from "./presentation/components/loader";
-import { Navigation } from "./presentation/components/navigation/navigation";
 
-import Button from "./presentation/components/button";
-import EditableField from "./presentation/components/editable-field";
-// import SyncTable from "./presentation/components/sync-table";
-import FolderSelect from "./presentation/components/folder-select";
+const LazyCreateDocumentDialog = lazy(async () => {
+	const module = await import(
+		"./presentation/view/components/side-bar/create-document-dialog"
+	);
 
-import "./app.scss";
-import { Heading, HeadingLevel } from "@ariakit/react";
-import { Icon } from "./presentation/components/icon";
+	return { default: module.CreateDocumentDialog };
+});
 
-import { App as AbstractApp } from "@packages/ui/abstract/app";
-import { DocumentViewer } from "@packages/ui/components/document-viewer/";
+const LazyDisplaySelectPage = lazy(async () => {
+	const module = await import(
+		"./presentation/view/components/display-select/display-select-page"
+	);
 
-const App = () => {
-  const {
-    appProfile: {
-      application: { version, name: applicationName },
-      user: { login, languages },
-      profile: {
-        parameters: { displaySelectLayout },
-      },
-    },
-    displaySelect,
-    appTitle,
-    loadingPath,
-    folderTree,
-    naturesStore,
-    saveNatures,
-    navigateFn,
-    currentNode,
-    currentFiles,
-    isConverterEnabled,
-  } = useAppContext();
+	return { default: module.DisplaySelectPage };
+});
 
-  const {
-    status,
-    isLoading,
-    selectedDocument,
-    initialRecord,
-    createNewDocument,
-    cancelDocument,
-    displayedFile,
-  } = useDocument();
-  const { records, setRequest } = usePersisterContext();
+const DocumentViewerLoadableBridge = createComponent(
+	({
+		models: {
+			documentModel: {
+				selectedDocumentCode,
+				selectedDocumentViewerContent,
+			},
+		},
+	}) => {
+		const { setIsLoading } = useLoadable();
 
-  const { extensionsTargetMap } = usePDFActionsStatus(
-    currentFiles.map(({ instance }) => instance),
-    currentNode.nature?.config.extension?.split(",") || [],
-    isConverterEnabled
-  );
+		const viewerDocumentCode =
+			selectedDocumentViewerContent?.documentCode;
 
-  const viewerProps = useViewerProps();
+		const hasViewerSelection = Boolean(
+			viewerDocumentCode || selectedDocumentCode,
+		);
 
-  const currentRecord = useMemo(() => {
-    return (
-      records.find(
-        (record) => record.documentCode === currentNode.document?.documentCode
-      ) || initialRecord
-    );
-  }, [records, currentNode, initialRecord]);
+		const isFetchingViewerPayload = Boolean(
+			selectedDocumentViewerContent?.loading,
+		);
 
-  const appName = useMemo(() => {
-    for (const lang of languages) {
-      if (applicationName[lang]) {
-        return applicationName[lang];
-      }
-    }
-    return "";
-  }, [languages, applicationName]);
+		const hasViewerUrl = Boolean(selectedDocumentViewerContent?.url);
+		const hasViewerError = Boolean(
+			selectedDocumentViewerContent?.error,
+		);
 
-  // test
-  const [documentUrl, setDocumentUrl] = useState<string | null>(null);
+		useEffect(() => {
+			if (!hasViewerSelection) {
+				setIsLoading(false);
+				return;
+			}
 
-  useEffect(() => {
-    if (!displayedFile?.instance) return;
+			setIsLoading(
+				isFetchingViewerPayload || (!hasViewerUrl && !hasViewerError),
+			);
+		}, [
+			hasViewerSelection,
+			isFetchingViewerPayload,
+			hasViewerUrl,
+			hasViewerError,
+			setIsLoading,
+		]);
 
-    const url = URL.createObjectURL(displayedFile.instance);
-    setDocumentUrl(url);
+		return null;
+	},
+);
 
-    // Nettoyage pour éviter les fuites mémoire
-    return () => {
-      URL.revokeObjectURL(url);
-    };
-  }, [displayedFile?.instance]);
+const FLOW_DEBUG_KEY = "__ERMEWA_FLOW_DEBUG__";
+const CRITICAL_DOCUMENT_BOOT_TIMEOUT_MS = 5000;
 
-  return (
-    <AbstractApp>
-      <HeadingLevel>
-        <header className="app-header">
-          <div className={classNames("app-name")}>
-            <Heading>
-              {appName}&nbsp;
-              <br />
-              <span>
-                <span className={classNames("version")}>{version}</span>
-                {" · "}
-                {new Date().toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                })}
-                {" · "}
-                {login}
-              </span>
-            </Heading>
-          </div>
+const waitForNextPaint = () =>
+	new Promise<void>((resolve) => {
+		window.requestAnimationFrame(() => {
+			window.requestAnimationFrame(() => {
+				resolve();
+			});
+		});
+	});
 
-          {folderTree && <div className="wagon">{appTitle}</div>}
-          <div className={"right"}>
-            {folderTree && (
-              <Button
-                onClick={() => {
-                  const pathParts = window.location.pathname
-                    .split("/")
-                    .filter(Boolean);
+const wait = (ms: number) =>
+	new Promise<void>((resolve) => {
+		window.setTimeout(resolve, ms);
+	});
 
-                  const basePathIndex = import.meta.env.DEV ? 0 : 2;
-                  const basePath = pathParts[basePathIndex];
-
-                  if (basePath) {
-                    const targetPath = `/${pathParts.slice(0, basePathIndex + 1).join("/")}/`;
-                    window.location.href = targetPath;
-                  }
-                }}
-              >
-                <Icon.MenuSearch size="small" />
-                Folders
-              </Button>
-            )}
-            {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-            <div
-              className="logged-user"
-              title={login}
-              onClick={() => {
-                window.location.reload();
-              }}
-            >
-              {login[0]}
-            </div>
-          </div>
-        </header>
-        <main>
-          {!folderTree && (
-            <FolderSelect
-              items={displaySelect}
-              parameter={displaySelectLayout as DisplaySelectParameterInterface}
-            />
-          )}
-          {folderTree && (
-            <Navigation
-              {...{
-                loadingPath,
-                navigateFn,
-                folderTree,
-                naturesStore,
-                saveNatures,
-                createNewDocument,
-                cancelDocument,
-                currentNode,
-                records,
-              }}
-            />
-          )}
-
-          {/* {currentRecord && (
-					<DocumentViewer {...viewerProps}>
-					<div className="document-infos">
-					{!isLoading ? (
-						<div
-						title={
-							status.label !== "rejected"
-							? status.label
-							: `${status.label} - ${selectedDocument?.memo}`
-							}
-							className="document-status"
-							style={{ backgroundColor: status.backgroundColor }}
-							/>
-							) : (
-								<Loader />
-								)}
-								<EditableField
-								label="Base Name"
-								initialValue={currentRecord.name}
-								onChange={(value) => {
-									setRequest({
-										documentCode: currentRecord.documentCode,
-										name: value,
-										});
-										}}
-										/>
-										{currentNode.nature?.config.documentDate && (
-											<EditableField
-											isDate
-											label="Document Date"
-											initialValue={currentRecord.documentDate}
-											onChange={(value) => {
-												setRequest({
-													documentCode: currentRecord.documentCode,
-													name: currentRecord.name,
-													documentDate: value,
-													});
-													}}
-													/>
-													)}
-													{currentNode.nature?.config.dueDate !== 3 && (
-														<EditableField
-														isDate
-														label="Document Expires"
-														initialValue={currentRecord?.documentExpires}
-														onChange={(value) => {
-															setRequest({
-																documentCode: currentRecord.documentCode,
-																name: currentRecord.name,
-																documentExpires: value,
-																});
-																}}
-																/>
-																)}
-																</div>
-																<div className="document-actions">
-																<div className={classNames("extensions")}>
-																{extensionsTargetMap.map(({ Icon, ext, key }) => (
-																	<span key={key} className="file-extension-icon" title={ext}>
-																	{Icon}
-																	</span>
-																	))}
-																	</div>
-																	{viewerProps.actions
-																	.filter(({ slot }) => slot === "document")
-																	.map(
-																		({ handler, label, predicate }) =>
-																		predicate && (
-																		<Button onClick={() => handler()} disabled={isLoading}>
-																		{label}
-																		</Button>
-																		),
-																		)}
-																		</div>
-																		</DocumentViewer>
-																		)} */}
-          {currentNode.document?.file.type && documentUrl && (
-            <DocumentViewer
-              url={documentUrl}
-              type={currentNode.document.file.type}
-              name={currentNode.document.name.baseName}
-              date={currentNode.document.documentDate}
-              expires={currentNode.document.documentExpires}
-              status={currentNode.document.state}
-              readonly={false}
-            />
-          )}
-          {/* <SyncTable {...{ records, savable, save }} /> */}
-        </main>
-      </HeadingLevel>
-    </AbstractApp>
-  );
+type FlowDebugEvent = {
+	ts: string;
+	scope: string;
+	event: string;
+	payload?: unknown;
 };
 
+const toDebugError = (error: unknown) =>
+	error instanceof Error
+		? {
+				name: error.name,
+				message: error.message,
+			}
+		: { message: String(error) };
+
+const pushAppFlowDebug = (event: string, payload?: unknown) => {
+	const entry: FlowDebugEvent = {
+		ts: new Date().toISOString(),
+		scope: "app",
+		event,
+		payload,
+	};
+
+	console.log(`[FLOW][app] ${event}`, payload ?? "");
+
+	const root = window as Window & {
+		[FLOW_DEBUG_KEY]?: FlowDebugEvent[];
+	};
+
+	const current = root[FLOW_DEBUG_KEY] ?? [];
+	current.push(entry);
+	if (current.length > 500) {
+		current.splice(0, current.length - 500);
+	}
+	root[FLOW_DEBUG_KEY] = current;
+};
+
+const ensureDevAuthWarmup = async () => {
+	if (
+		import.meta.env.MODE !== "development" ||
+		import.meta.env.VITE_ENABLE_OFFLINE_SERVICES === "true"
+	) {
+		pushAppFlowDebug("dummy.auth.skip", {
+			mode: import.meta.env.MODE,
+		});
+		return;
+	}
+
+	pushAppFlowDebug("dummy.auth.start");
+
+	try {
+		const response = await api.dummy.get.auth();
+		console.log(response);
+	} catch (error) {
+		console.error(error);
+	}
+	// const response =
+	// console.log(response);
+
+	// if (!response.ok) {
+	// 	throw new Error(
+	// 		`dummy auth failed (${response.error.kind}${
+	// 			"status" in response.error &&
+	// 			typeof response.error.status === "number"
+	// 				? `:${response.error.status}`
+	// 				: ""
+	// 		})`,
+	// 	);
+	// }
+
+	pushAppFlowDebug("dummy.auth.done");
+};
+
+const isFolderSelectionEntry = (
+	pathname: string,
+	search: string,
+): boolean => {
+	const [folderNameFromQuery = "", folderSidFromQuery = ""] = (
+		new URLSearchParams(search).get("FLD")?.trim() ?? ""
+	).split("$");
+
+	if (folderNameFromQuery && folderSidFromQuery) {
+		return false;
+	}
+
+	return pathname.split("/").filter(Boolean).length < 2;
+};
+
+const EDM12 = createComponent(
+	({
+		models: {
+			i18nModel: { i18n },
+		},
+		controllers: {
+			folderTreeController: {
+				readTargetFolderFromLocation,
+				readCreateDocumentRequestFromLocation,
+				openCreateDocumentDialogFromLocation,
+				ensureTreeShellLoaded,
+				expandPathToFolder,
+				hydrateFolderContext,
+			},
+			documentController: {
+				readNavigationFromLocation,
+				preloadDocumentDescriptor,
+				preloadDocumentBinary,
+				attachPreloadedDocumentToCanonicalContext,
+				refreshAllEditorActions,
+			},
+			appController: { loadAppProfile },
+			displaySelectController: { ensureDisplaySelectLoaded },
+		},
+	}) => {
+		const location = useLocation();
+		const bootRef = useRef(false);
+		const [sidebarReady, setSidebarReady] = useState(false);
+		const [loading, setLoading] = useState(true);
+		const [folderSelectionReady, setFolderSelectionReady] =
+			useState(false);
+
+		const folderSelectionEntry = isFolderSelectionEntry(
+			location.pathname,
+			location.search,
+		);
+
+		const viewerReadyResolveRef = useRef<(() => void) | null>(null);
+
+		const handleViewerPrimaryPaintReady = useCallback(
+			(documentCode: string) => {
+				pushAppFlowDebug("viewer.primary-paint", {
+					documentCode,
+				});
+
+				void waitForNextPaint().then(() => {
+					pushAppFlowDebug("viewer.paint-flushed", {
+						documentCode,
+					});
+					viewerReadyResolveRef.current?.();
+					viewerReadyResolveRef.current = null;
+				});
+			},
+			[],
+		);
+
+		useEffect(() => {
+			if (bootRef.current) return;
+			bootRef.current = true;
+
+			if (folderSelectionEntry) {
+				pushAppFlowDebug("folder-selection.boot.start");
+
+				void (async () => {
+					try {
+						await ensureDevAuthWarmup();
+					} catch (error) {
+						pushAppFlowDebug("dummy.auth.error", toDebugError(error));
+						return;
+					}
+
+					const profilePromise = (async () => {
+						pushAppFlowDebug("xprm.start");
+						try {
+							const result = await loadAppProfile();
+							pushAppFlowDebug("xprm.done", {
+								ok: result?.ok,
+							});
+							return result;
+						} catch (error) {
+							pushAppFlowDebug("xprm.error", toDebugError(error));
+							throw error;
+						}
+					})();
+
+					const displaySelectPromise = (async () => {
+						pushAppFlowDebug("xsel.start");
+						try {
+							const itemCount = await ensureDisplaySelectLoaded();
+							pushAppFlowDebug("xsel.done", {
+								ok: itemCount !== undefined,
+								itemCount,
+							});
+							return itemCount;
+						} catch (error) {
+							pushAppFlowDebug("xsel.error", toDebugError(error));
+							throw error;
+						}
+					})();
+
+					await Promise.allSettled([
+						profilePromise,
+						displaySelectPromise,
+					]);
+
+					setFolderSelectionReady(true);
+					pushAppFlowDebug("folder-selection.boot.complete");
+				})();
+
+				return;
+			}
+
+			const navigation = readNavigationFromLocation();
+			const targetFolder = readTargetFolderFromLocation();
+			const createDocumentRequest =
+				readCreateDocumentRequestFromLocation();
+
+			pushAppFlowDebug("boot.start", {
+				navigation,
+				targetFolder,
+				createDocumentRequest,
+			});
+
+			const viewerReadyPromise = new Promise<string>((resolve) => {
+				viewerReadyResolveRef.current = () => {
+					resolve("viewer-ready");
+				};
+			});
+
+			void (async () => {
+				try {
+					await ensureDevAuthWarmup();
+				} catch (error) {
+					pushAppFlowDebug("dummy.auth.error", toDebugError(error));
+					setSidebarReady(true);
+					return;
+				}
+
+				const profilePromise = (async () => {
+					pushAppFlowDebug("xprm.start");
+					try {
+						const result = await loadAppProfile();
+						pushAppFlowDebug("xprm.done", {
+							ok: result?.ok,
+						});
+						return result;
+					} catch (error) {
+						pushAppFlowDebug("xprm.error", toDebugError(error));
+						throw error;
+					}
+				})();
+
+				const treeShellPromise = (async () => {
+					pushAppFlowDebug("xtree.shell.start");
+					try {
+						await ensureTreeShellLoaded();
+						if (targetFolder?.sid) {
+							expandPathToFolder(targetFolder.sid);
+						}
+						pushAppFlowDebug("xtree.shell.done", {
+							targetFolderSid: targetFolder?.sid,
+						});
+					} catch (error) {
+						pushAppFlowDebug("xtree.shell.error", toDebugError(error));
+						throw error;
+					} finally {
+						setSidebarReady(true);
+					}
+				})();
+
+				void profilePromise.catch(() => undefined);
+				void treeShellPromise.catch(() => undefined);
+
+				let hasDescriptor = false;
+
+				const descriptorPromise = navigation
+					? (async () => {
+							try {
+								const descriptor =
+									await preloadDocumentDescriptor(navigation);
+
+								hasDescriptor = Boolean(descriptor);
+								pushAppFlowDebug("descriptor.xdoc.done", {
+									hasDescriptor,
+									documentCode: navigation.documentCode,
+								});
+
+								return descriptor;
+							} catch (error) {
+								pushAppFlowDebug(
+									"descriptor.xdoc.error",
+									toDebugError(error),
+								);
+								return undefined;
+							}
+						})()
+					: Promise.resolve(undefined);
+
+				const criticalBinaryPromise = navigation
+					? descriptorPromise.then((descriptor) => {
+							if (!descriptor) {
+								return false;
+							}
+
+							return preloadDocumentBinary(navigation, descriptor, {
+								source: "xdoc",
+							});
+						})
+					: Promise.resolve(false);
+
+				const backgroundUnlockReason = navigation
+					? await Promise.race([
+							viewerReadyPromise,
+							criticalBinaryPromise
+								.then((ok) =>
+									ok
+										? new Promise<string>(() => {})
+										: "critical-binary-miss",
+								)
+								.catch(() => "critical-binary-error"),
+							wait(CRITICAL_DOCUMENT_BOOT_TIMEOUT_MS).then(
+								() => "timeout",
+							),
+						])
+					: "no-navigation";
+
+				pushAppFlowDebug("background.unlock", {
+					reason: backgroundUnlockReason,
+					hasNavigation: Boolean(navigation),
+					hasDescriptor,
+				});
+
+				const folderHydrationPromise = targetFolder
+					? (async () => {
+							pushAppFlowDebug("folder.hydrate.start", targetFolder);
+							try {
+								await treeShellPromise;
+								const ok = await hydrateFolderContext(targetFolder);
+								pushAppFlowDebug("folder.hydrate.done", {
+									ok,
+									folderSid: targetFolder.sid,
+								});
+								return ok;
+							} catch (error) {
+								pushAppFlowDebug(
+									"folder.hydrate.error",
+									toDebugError(error),
+								);
+								throw error;
+							}
+						})()
+					: Promise.resolve(false);
+
+				void (async () => {
+					try {
+						await folderHydrationPromise;
+
+						if (createDocumentRequest) {
+							const opened = openCreateDocumentDialogFromLocation();
+							pushAppFlowDebug("create-document-dialog.open", {
+								opened,
+								...createDocumentRequest,
+							});
+						}
+
+						if (navigation) {
+							const attached =
+								await attachPreloadedDocumentToCanonicalContext(
+									navigation,
+								);
+
+							pushAppFlowDebug("canonical.attach.done", {
+								attached,
+								documentCode: navigation.documentCode,
+							});
+						}
+					} catch (error) {
+						pushAppFlowDebug(
+							"canonical.attach.error",
+							toDebugError(error),
+						);
+					}
+				})();
+
+				void (async () => {
+					try {
+						await profilePromise;
+					} catch {
+						// already logged above
+					} finally {
+						refreshAllEditorActions();
+						pushAppFlowDebug("boot.complete", {
+							hasNavigation: Boolean(navigation),
+							hasTargetFolder: Boolean(targetFolder),
+						});
+					}
+				})();
+			})();
+		}, [
+			attachPreloadedDocumentToCanonicalContext,
+			expandPathToFolder,
+			ensureTreeShellLoaded,
+			hydrateFolderContext,
+			folderSelectionEntry,
+			loadAppProfile,
+			ensureDisplaySelectLoaded,
+			openCreateDocumentDialogFromLocation,
+			preloadDocumentBinary,
+			preloadDocumentDescriptor,
+			readCreateDocumentRequestFromLocation,
+			readNavigationFromLocation,
+			readTargetFolderFromLocation,
+			refreshAllEditorActions,
+		]);
+
+		if (folderSelectionEntry) {
+			return (
+				<App>
+					<HeadingLevel>
+						<AppHeader />
+						{folderSelectionReady ? (
+							<Suspense fallback={null}>
+								<LazyDisplaySelectPage />
+							</Suspense>
+						) : (
+							<Stack grow alignItems="center" justifyContent="center">
+								<Loader />
+								{i18n.t("loadingFolders")}
+							</Stack>
+						)}
+					</HeadingLevel>
+				</App>
+			);
+		}
+
+		return (
+			<App>
+				<Suspense fallback={null}>
+					<LazyCreateDocumentDialog />
+				</Suspense>
+				<HeadingLevel>
+					<AppHeader />
+					<main>
+						{sidebarReady ? (
+							<SideBar />
+						) : (
+							<div
+								style={{ width: 300, minWidth: 300, flexShrink: 0 }}
+							/>
+						)}
+						<Loadable.Provider>
+							<DocumentViewerLoadableBridge />
+							<Loadable.Content>
+								<DocumentViewerSlot
+									onPrimaryPaintReady={handleViewerPrimaryPaintReady}
+								/>
+							</Loadable.Content>
+							<Loadable.Loader>
+								<Stack grow alignItems="center" justifyContent="center">
+									<Loader />
+									{i18n.t("loadingView")}
+								</Stack>
+							</Loadable.Loader>
+						</Loadable.Provider>
+					</main>
+				</HeadingLevel>
+			</App>
+		);
+	},
+);
+
 export default () => {
-  return (
-    <PersisterContextProvider>
-      <App />
-    </PersisterContextProvider>
-  );
+	return <EDM12 />;
 };

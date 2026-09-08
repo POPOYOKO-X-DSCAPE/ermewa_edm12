@@ -1,66 +1,80 @@
 import { css } from "@styles";
 
 export const pandaContainer = css({
-  display: "flex",
+	display: "flex",
+	flexDirection: "column",
+	minWidth: "c.documentViewer.thumbnailContainer",
 });
 
 export const pandaThumbnails = css({
-  gap: "s.padding.s",
-  padding: "s.padding.s",
-  bg: "s.bg.elevated.initial",
+	gap: "s.padding.s",
+	padding: "s.padding.s",
+	bg: "s.bg.elevated.initial",
 });
 
 export const stylePageNumber = css({
-  height: "24px",
-  backgroundColor: "s.bg.elevated.initial",
-  paddingX: "s.padding.xxs",
-  position: "absolute",
-  left: "s.margin.s",
-  bottom: "s.margin.s",
+	height: "c.documentViewer.pageNumber",
+	backgroundColor: "s.bg.elevated.initial",
+	paddingX: "s.padding.xxs",
+	position: "absolute",
+	left: "s.margin.s",
+	bottom: "s.margin.s",
 });
 
 export const pandaThumbnailContainer = css({
-  gap: "s.padding.m",
+	gap: "s.padding.m",
 });
 
 export const pandaThumbnail = css({
-  border: "1px solid #ccc",
-  cursor: "pointer",
-  _hover: {
-    border: "1px solid #333",
-  },
+	borderWidth: "1px",
+	borderStyle: "solid",
+	borderColor: "c.documentViewer.border.initial",
+	cursor: "pointer",
+	_hover: {
+		borderWidth: "1px",
+		borderStyle: "solid",
+		borderColor: "c.documentViewer.border.hover",
+	},
 });
 
 export const pandaViewer = css({
-  gap: "s.margin.m",
-  bg: "s.bg.default.initial",
-  overflowX: "hidden",
+	gap: "s.margin.m",
+	padding: "s.padding.m",
+	bg: "s.bg.default.initial",
+	overflowX: "hidden",
 });
 
 export const pandaViewerPadding = css({
-  padding: "s.padding.m",
+	padding: "s.padding.m",
 });
 
 export const pandaHide = css({
-  opacity: 0,
-  transition: "opacity .6s ease-out",
+	opacity: 0,
+	transition: "opacity .6s ease-out",
 });
 
 export const pandaOverlay = css({
-  transition: "opacity .3s ease-out",
+	transition: "opacity .3s ease-out",
 });
 
 export const pandaShow = css({
-  opacity: "1",
+	opacity: "1",
 });
 
 export const pandaPage = css({
-  border: "1px solid #ccc",
+	borderWidth: "1px",
+	borderStyle: "solid",
+	borderColor: "c.documentViewer.border.initial",
 });
 
 export const pandaDocument = css({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  gap: "s.margin.xxl",
+	display: "flex",
+	flexDirection: "column",
+	alignItems: "center",
+	gap: "s.margin.xxl",
+});
+
+export const pandaThumbnailsButtons = css({
+	gap: "s.padding.s",
+	padding: "s.padding.s",
 });

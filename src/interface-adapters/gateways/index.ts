@@ -1,23 +1,27 @@
-import adaptAppProfileResponse from "./app-profile/response-adapter";
-import adaptDocumentResponse from './document-fetch/response-adapter';
-import adaptDocumentUpdateRequest from "./document-update/request-adapter";
-import adaptDocumentUploadRequest from "./document-upload/request-adapter";
-import adaptDocumentDeleteRequest from "./document-delete/request-adapter";
-import adaptFileBodyRequest from "./file/request-adapter";
-import adaptFolderTree from "./folder-tree/response-adapter";
-import adaptNatureMasks from "./nature-mask/response-adapter";
-import adaptNatures from "./nature/response-adapter";
-import adaptRejectEmailInfo from './reject-email-info/response-adapter';
+import { appProfileAdapter } from "./app-profile.adapter";
+import { displaySelectAdapter } from "./display-select.adapter";
+import { documentDeleteAdapter } from "./document-delete.adapter";
+import { documentUpdateAdapter } from "./document-update.adapter";
+import { documentUploadAdapter } from "./document-upload.adapter";
+import { documentAdapter } from "./document.adapter";
+import { fileAdapter } from "./file.adapter";
+import { folderTreeAdapter } from "./folder-tree.adapter";
+import { naturesMasksAdapter } from "./natures-masks.adapter";
+import { naturesAdapter } from "./natures.adapter";
+import { rejectEmailInfoAdapter } from "./reject-email-info.adapter";
+import { sendMailAdapter } from "./send-mail.adapter";
 
-export {
-  adaptAppProfileResponse,
-  adaptFolderTree,
-  adaptNatures,
-  adaptNatureMasks,
-  adaptDocumentResponse,
-  adaptDocumentUploadRequest,
-  adaptFileBodyRequest,
-  adaptDocumentUpdateRequest,
-  adaptDocumentDeleteRequest,
-  adaptRejectEmailInfo,
-};
+export default [
+	appProfileAdapter,
+	documentAdapter,
+	documentDeleteAdapter,
+	documentUpdateAdapter,
+	documentUploadAdapter,
+	sendMailAdapter,
+	rejectEmailInfoAdapter,
+	fileAdapter,
+	folderTreeAdapter,
+	naturesAdapter,
+	naturesMasksAdapter,
+	displaySelectAdapter,
+];

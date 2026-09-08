@@ -1,7 +1,7 @@
 import type { ComponentChildren } from "preact";
-import "./index.scss";
 
 import classNames from "classnames";
+import { loader } from "./styles";
 
 interface LoaderProps {
 	children?: ComponentChildren;

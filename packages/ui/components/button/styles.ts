@@ -3,6 +3,12 @@ import { css } from "@styles";
 const common = css({
 	alignItems: "center",
 	cursor: "pointer",
+	_focusVisible: {
+		outlineWidth: "2px",
+		outlineStyle: "solid",
+		outlineColor: "s.fg.elevated.active",
+		outlineOffset: "2px",
+	},
 });
 
 const primary = css({
@@ -29,8 +35,12 @@ const secondary = css({
 	},
 });
 
+const disabled = css({
+	opacity: 0.2,
+});
+
 const menu = css({
-	bg: "#fff",
+	bg: "c.buttonMenu.bg.initial",
 	color: "c.buttonMenu.fg.initial",
 	minWidth: "100%",
 	zIndex: 100,
@@ -59,4 +69,5 @@ export const Styles = {
 	secondary,
 	menu,
 	menuItem,
+	disabled,
 };

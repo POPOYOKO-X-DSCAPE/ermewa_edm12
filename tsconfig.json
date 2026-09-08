@@ -1,8 +1,53 @@
 {
-	"extends": "../../tsconfig.json",
 	"compilerOptions": {
+		"lib": [
+			"ESNext",
+			"DOM"
+		],
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleDetection": "force",
+		"jsx": "react-jsx",
+		"allowJs": true,
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
+		"noEmit": true,
+		"strict": true,
+		"skipLibCheck": true,
+		"noFallthroughCasesInSwitch": true,
+		"types": [
+			"bun",
+			"vite/client"
+		],
 		"paths": {
-			"@/*": ["./src/*"]
-		}
-	}
+			"@styles": [
+				"./styled-system/css/css"
+			],
+			"@styled": [
+				"./styled-system/jsx"
+			],
+			"@src": [
+				"./src"
+			],
+			"@src/*": [
+				"./src/*"
+			],
+			"@packages": [
+				"./packages"
+			],
+			"@packages/*": [
+				"./packages/*"
+			]
+		},
+		"noImplicitAny": false
+	},
+	"include": [
+		"src",
+		"packages",
+		"vite.config.ts",
+		"panda.config.ts",
+		"panda.custom.config.ts",
+		"vite-env.d.ts"
+	]
 }

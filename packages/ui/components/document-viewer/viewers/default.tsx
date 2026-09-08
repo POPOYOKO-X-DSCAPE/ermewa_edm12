@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from "react";
+import { usePdfViewerStrings } from "./pdf/pdf-strings";
 
 interface DefaultViewerProps {
 	url: string;
@@ -13,6 +14,7 @@ export const DefaultViewer = ({
 	currentZoom = 1,
 	onZoomChange,
 }: DefaultViewerProps) => {
+	const strings = usePdfViewerStrings();
 	const effectiveZoom = useMemo(() => {
 		return currentZoom;
 	}, [currentZoom]);
@@ -50,10 +52,10 @@ export const DefaultViewer = ({
 			<iframe
 				src={url}
 				style={{ width: "100%", height: "100%", border: "none" }}
-				title="Text document"
+				title={strings.textDocument}
 			/>
 		);
 	}
 
-	return <p>Type de document non pris en charge</p>;
+	return <p>{strings.unsupportedType}</p>;
 };

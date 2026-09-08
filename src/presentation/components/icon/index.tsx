@@ -25,7 +25,7 @@ import Nature from "../../icons/nature.svg?react";
 import Reload from "../../icons/reload.svg?react";
 import Sync from "../../icons/sync.svg?react";
 import ViewPages from "../../icons/view-pages.svg?react";
-import "./index.scss";
+import { documentExtension, icon } from "./styles";
 
 export type IconSize = "small" | "medium" | "large";
 
@@ -37,7 +37,7 @@ interface IconProps {
 
 export const Icon = ({ children, size = "medium", title }: IconProps) => {
 	return (
-		<div className={classNames("icon", size)} title={title}>
+		<div className={classNames(icon, size)} title={title}>
 			{children}
 		</div>
 	);
@@ -248,7 +248,7 @@ Icon.DocumentExtension = ({
 }: DocumentExtensionProps) => {
 	return (
 		<div
-			className={classNames("document-extension", "icon", "large")}
+			className={classNames(documentExtension, icon, "large")}
 			title={title}
 		>
 			<div className={"extension-name"}>{extension}</div>
