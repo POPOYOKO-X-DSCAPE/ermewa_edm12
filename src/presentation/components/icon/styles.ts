@@ -21,7 +21,7 @@ export const icon = css({
 
 export const documentExtension = css({
 	position: "relative",
-	".extension-name": {
+	"& .extension-name": {
 		transform: "translate(-50%, -50%)",
 		position: "absolute",
 		textTransform: "uppercase",
@@ -33,7 +33,7 @@ export const documentExtension = css({
 		textAlign: "center",
 		fontFamily: "s.fonts.heading",
 	},
-	svg: {
+	_icon: {
 		width: "100%",
 	},
 });

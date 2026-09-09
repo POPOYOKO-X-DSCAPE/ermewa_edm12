@@ -14,6 +14,8 @@ export const appStore = createStore(
 
 		folderTreeStructure: optional("object"),
 
+		selectedDocument: optional("string"),
+
 		createDocumentDialog: optional({
 			folderSid: "string",
 			natureCode: "string",
@@ -70,9 +72,10 @@ export const appStore = createStore(
 			statuses: array("number"),
 		}),
 	}),
-)({
+)(	{
 	currentNavigation: undefined,
 	folderTreeStructure: undefined,
+	selectedDocument: undefined,
 	createDocumentDialog: undefined,
 	expandedFolderSids: [],
 	loadedFolders: [],

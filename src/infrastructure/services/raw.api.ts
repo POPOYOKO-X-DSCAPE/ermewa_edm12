@@ -53,7 +53,8 @@ switch (import.meta.env.MODE) {
 		break;
 	}
 	case "production":
-		baseUrl = window.location.origin + window.location.pathname;
+		baseUrl =
+			VITE_API_HOST || window.location.origin + window.location.pathname;
 		break;
 }
 

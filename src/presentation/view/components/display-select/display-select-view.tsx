@@ -112,6 +112,7 @@ export const DisplaySelectView = ({
 				<HeadingLevel>
 					<Header />
 					<Results>
+						{/* biome-ignore lint/a11y/useSemanticElements: live region semantics kept on <p> to preserve layout */}
 						<p role="status">{t("displaySelectLoading")}</p>
 					</Results>
 				</HeadingLevel>
@@ -260,6 +261,7 @@ export const DisplaySelectView = ({
 					<Scrollable.Content>
 						<Results>
 							{state === "empty" ? (
+								// biome-ignore lint/a11y/useSemanticElements: live region semantics kept on <p> to preserve layout
 								<p role="status">{t("displaySelectNoMatches")}</p>
 							) : (
 								<Stack className={styles.resultsList}>

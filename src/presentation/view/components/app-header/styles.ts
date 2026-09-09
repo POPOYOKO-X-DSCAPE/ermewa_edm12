@@ -49,7 +49,7 @@ export const wagon = css({
 	borderRadius: "s.radii.radius.m",
 	backgroundColor: "s.bg.default.initial",
 	fontFamily: "s.fonts.heading",
-	svg: {
+	_icon: {
 		width: "s.sizes.wagonIcon",
 		height: "s.sizes.wagonIcon",
 	},

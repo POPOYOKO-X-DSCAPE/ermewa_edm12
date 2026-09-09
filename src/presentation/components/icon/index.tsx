@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import type { ComponentChildren } from "preact";
+import type { ReactNode } from "react";
 import AddFile from "../../icons/add-file.svg?react";
 import Add from "../../icons/add.svg?react";
 import ArrowDown from "../../icons/arrow-down.svg?react";
@@ -30,7 +30,7 @@ import { documentExtension, icon } from "./styles";
 export type IconSize = "small" | "medium" | "large";
 
 interface IconProps {
-	children: string | ComponentChildren;
+	children: string | ReactNode;
 	size: IconSize;
 	title?: string;
 }

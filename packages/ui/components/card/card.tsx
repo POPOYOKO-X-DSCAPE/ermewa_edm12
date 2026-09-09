@@ -1,4 +1,3 @@
-// biome-ignore lint/style/useImportType: <explanation>
 import classNames from "classnames";
 import { styles } from "./styles";
 interface CardProps {

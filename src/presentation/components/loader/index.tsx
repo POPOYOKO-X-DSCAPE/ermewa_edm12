@@ -1,10 +1,10 @@
-import type { ComponentChildren } from "preact";
+import type { ReactNode } from "react";
 
 import classNames from "classnames";
 import { loader } from "./styles";
 
 interface LoaderProps {
-	children?: ComponentChildren;
+	children?: ReactNode;
 	fillContainer?: boolean
 }
 
