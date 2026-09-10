@@ -147,7 +147,11 @@ const readTargetFolderFromLocation = (): FolderRef | undefined => {
 	const [folderNameFromQuery = "", folderSidFromQuery = ""] =
 		fld.split("$");
 
-	const segments = url.pathname.split("/").filter(Boolean);
+	const sitePrefix = import.meta.env.BASE_URL.replace(/\/+$/, "");
+	const relativePathname = sitePrefix
+		? (url.pathname.slice(sitePrefix.length) || "/")
+		: url.pathname;
+	const segments = relativePathname.split("/").filter(Boolean);
 	const folderNameFromPath = segments[0] ?? "";
 	const folderSidFromPath = segments[1] ?? "";
 
