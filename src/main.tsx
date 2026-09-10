@@ -13,9 +13,7 @@ const root = createRoot(container);
 root.render(
 	<Router
 		basename={
-			import.meta.env.PROD
-				? `${import.meta.env.BASE_URL}app/EDM12/`
-				: "/"
+			import.meta.env.PROD ? import.meta.env.BASE_URL : "/"
 		}
 	>
 		<ColorModeProvider>
