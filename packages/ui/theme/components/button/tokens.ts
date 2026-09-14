@@ -32,6 +32,20 @@ const menuItemsColors = defineTokens.colors({
 	fg: { initial: fg.actionLow.initial, hover: fg.actionLow.hover },
 });
 
+const ghostColors = defineTokens.colors({
+	bg: { initial: { value: "transparent" }, hover: bg.default.hover },
+	fg: { initial: fg.default.initial, hover: fg.default.hover },
+});
+
+export const buttonGhost = defineTokens({
+	radii: defineTokens.radii({ radius: radius.s }),
+	spacing: defineTokens.spacing({
+		padding: padding.xs,
+		gap: padding.xxs,
+	}),
+	colors: ghostColors,
+});
+
 export const buttonPrimary = defineTokens({
 	radii,
 	spacing,

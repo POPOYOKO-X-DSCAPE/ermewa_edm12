@@ -10,7 +10,7 @@ import type { ReactNode } from "react";
 import type { Action } from "../../types";
 import { Styles } from "./styles";
 
-export type ButtonLevel = "primary" | "secondary";
+export type ButtonLevel = "primary" | "secondary" | "ghost";
 
 interface IButtonProps {
 	children: ReactNode;
@@ -18,6 +18,8 @@ interface IButtonProps {
 	level?: ButtonLevel;
 	onClick?: () => void;
 	disabled?: boolean;
+	className?: string;
+	"aria-label"?: string;
 }
 
 export const Button = ({
@@ -26,17 +28,28 @@ export const Button = ({
 	level = "primary",
 	onClick,
 	disabled,
+	className,
+	...aria
 }: IButtonProps) => {
+	const levelStyle =
+		level === "secondary"
+			? Styles.secondary
+			: level === "ghost"
+				? Styles.ghost
+				: Styles.primary;
+
 	return (
 		<AriaButton
 			onClick={onClick}
 			className={classNames(
-				level === "secondary" ? Styles.secondary : Styles.primary,
-				disabled && Styles.disabled,
 				Styles.common,
+				levelStyle,
+				disabled && Styles.disabled,
+				className,
 			)}
 			type={type}
 			disabled={disabled}
+			{...aria}
 		>
 			{children}
 		</AriaButton>
@@ -68,7 +81,7 @@ Button.Menu = ({
 			<Menu className={Styles.menu}>
 				{items.map((child, index) => (
 					<MenuItem
-						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+						// biome-ignore lint/suspicious/noArrayIndexKey: menu items are static per usage
 						key={index}
 						onClick={() => child.callback()}
 						className={Styles.menuItem}

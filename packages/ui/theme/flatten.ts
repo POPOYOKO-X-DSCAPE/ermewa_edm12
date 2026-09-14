@@ -36,6 +36,7 @@ const tokenTypes = [
 	"fontSizes",
 	"fontWeights",
 	"radii",
+	"shadows",
 ] as const;
 
 // Flatten a map of component token bundles into a `c.<name>.*` tree suitable

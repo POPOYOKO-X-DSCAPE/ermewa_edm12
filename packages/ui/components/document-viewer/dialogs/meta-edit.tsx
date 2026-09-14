@@ -4,7 +4,10 @@ import { useEffect, useId, useState } from "react";
 import { Button } from "../../button/button";
 import { Dialog } from "../../dialog/dialog";
 import { styles } from "../styles";
-import type { DocumentViewerMetaDraft, DocumentViewerStrings } from "../types";
+import type {
+	DocumentViewerMetaDraft,
+	DocumentViewerStrings,
+} from "../types";
 import { resolveDocumentViewerStrings } from "../types";
 import {
 	getTodayIsoDate,

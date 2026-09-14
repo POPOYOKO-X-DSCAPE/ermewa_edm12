@@ -17,6 +17,7 @@ const primary = css({
 	rounded: "c.buttonPrimary.radius",
 	bg: "c.buttonPrimary.bg.initial",
 	color: "c.buttonPrimary.fg.initial",
+	textStyle: "actionL",
 	_hover: {
 		bg: "c.buttonPrimary.bg.hover",
 		color: "c.buttonPrimary.fg.hover",
@@ -29,9 +30,23 @@ const secondary = css({
 	rounded: "c.buttonSecondary.radius",
 	bg: "c.buttonSecondary.bg.initial",
 	color: "c.buttonSecondary.fg.initial",
+	textStyle: "actionL",
 	_hover: {
 		bg: "c.buttonSecondary.bg.hover",
 		color: "c.buttonSecondary.fg.hover",
+	},
+});
+
+const ghost = css({
+	gap: "c.buttonGhost.gap",
+	padding: "c.buttonGhost.padding",
+	rounded: "c.buttonGhost.radius",
+	bg: "c.buttonGhost.bg.initial",
+	color: "c.buttonGhost.fg.initial",
+	textStyle: "actionL",
+	_hover: {
+		bg: "c.buttonGhost.bg.hover",
+		color: "c.buttonGhost.fg.hover",
 	},
 });
 
@@ -67,6 +82,7 @@ export const Styles = {
 	common,
 	primary,
 	secondary,
+	ghost,
 	menu,
 	menuItem,
 	disabled,
