@@ -369,7 +369,9 @@ type JsonPayload<C> = C extends {
 type LastReturn<F> = F extends (...args: readonly never[]) => infer C
 	? C
 	: unknown;
-type CodecToken<F> = LastReturn<F> extends (...args: readonly never[]) => infer T
+type CodecToken<F> = LastReturn<F> extends (
+	...args: readonly never[]
+) => infer T
 	? T
 	: LastReturn<F>;
 
@@ -525,9 +527,13 @@ type GetUnit<
 	}>;
 }>;
 
+// body-bearing verbs share the post adapter pattern ({ body?, payload? })
+type BodyVerbs = "post" | "put" | "patch" | "delete";
+
 type PostUnit<
 	NS extends string,
 	EP extends string,
+	V extends BodyVerbs,
 	In,
 	Body,
 	Legacy,
@@ -535,10 +541,22 @@ type PostUnit<
 > = Readonly<{
 	[ns in NS]: Readonly<{
 		[ep in EP]: Readonly<{
-			post: AdapterPost<In, Body, Legacy, Out>;
+			[v in V]: AdapterPost<In, Body, Legacy, Out>;
 		}>;
 	}>;
 }>;
+
+type BodyVerbMethod<
+	NS extends string,
+	EP extends string,
+	E extends EndpointDef,
+	V extends BodyVerbs,
+> = <In, Out>(
+	cfg: Readonly<{
+		body?: AdapterBody<In, BodyT<E, V>>;
+		payload?: AdapterPayload<PayloadT<E, V>, Out>;
+	}>,
+) => PostUnit<NS, EP, V, In, BodyT<E, V>, PayloadT<E, V>, Out>;
 
 type AdaptEndpoint<
 	NS extends string,
@@ -553,21 +571,16 @@ type AdaptEndpoint<
 		}
 	: EmptyObj) &
 	(E extends { post: VerbDef }
-		? {
-				post: <In, Out>(
-					cfg: Readonly<{
-						body?: AdapterBody<In, BodyT<E, "post">>;
-						payload?: AdapterPayload<PayloadT<E, "post">, Out>;
-					}>,
-				) => PostUnit<
-					NS,
-					EP,
-					In,
-					BodyT<E, "post">,
-					PayloadT<E, "post">,
-					Out
-				>;
-			}
+		? { post: BodyVerbMethod<NS, EP, E, "post"> }
+		: EmptyObj) &
+	(E extends { put: VerbDef }
+		? { put: BodyVerbMethod<NS, EP, E, "put"> }
+		: EmptyObj) &
+	(E extends { patch: VerbDef }
+		? { patch: BodyVerbMethod<NS, EP, E, "patch"> }
+		: EmptyObj) &
+	(E extends { delete: VerbDef }
+		? { delete: BodyVerbMethod<NS, EP, E, "delete"> }
 		: EmptyObj);
 
 type AdaptNamespace<
@@ -638,8 +651,9 @@ type AdapterPostIn<Raw, A> = A extends {
 	? In & In2
 	: Raw;
 
-// decide validation payload type: post => AdaptedPostValidation, else Health
-type ValidationForVerb<V extends LowerMethod> = V extends "post"
+// decide validation payload type: body verbs (post/put/patch/delete) =>
+// AdaptedPostValidation (in/out health pair), else Health
+type ValidationForVerb<V extends LowerMethod> = V extends BodyVerbs
 	? AdaptedPostValidation
 	: Health;
 
@@ -682,11 +696,8 @@ type DataForVerb<
 			PayloadT<E, "get">,
 			AdapterAt<S, Units, NS, EP, "get">
 		>
-	: V extends "post"
-		? AdapterPostOut<
-				PayloadT<E, "post">,
-				AdapterAt<S, Units, NS, EP, "post">
-			>
+	: V extends BodyVerbs
+		? AdapterPostOut<PayloadT<E, V>, AdapterAt<S, Units, NS, EP, V>>
 		: PayloadT<E, V>;
 
 type BodyForVerb<
@@ -696,8 +707,10 @@ type BodyForVerb<
 	EP extends keyof S[NS]["endpoints"] & string,
 	V extends LowerMethod,
 	E extends EndpointDef,
-> = V extends "post"
-	? AdapterPostIn<BodyT<E, "post">, AdapterAt<S, Units, NS, EP, "post">>
+> = V extends BodyVerbs
+	? [BodyT<E, V>] extends [never]
+		? never
+		: AdapterPostIn<BodyT<E, V>, AdapterAt<S, Units, NS, EP, V>>
 	: BodyT<E, V>;
 
 // Adapted VerbGroup

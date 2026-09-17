@@ -464,7 +464,16 @@ const freezeModelValue = (value: unknown): unknown => {
 		return value;
 	}
 
-	return Object.freeze(value);
+	// The value may embed live package references (the store/entity error
+	// leaves, raw state arrays) that the runtime mutates in place on the
+	// next validation pass; freezing the shared reference would make that
+	// mutation throw, so freeze a snapshot instead. Proxies (tracked
+	// values) are not cloneable — fall back to freezing the original.
+	try {
+		return Object.freeze(structuredClone(value));
+	} catch {
+		return Object.freeze(value);
+	}
 };
 
 export const baseModelsFactory =

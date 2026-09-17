@@ -497,11 +497,19 @@ export const apiFactory = <S extends ApiSpec>(
 				};
 			}>;
 
-			if (def.post) {
-				epAdapt.post = (cfg: RuntimePostConfig) =>
-					({ [ns]: { [ep]: { post: cfg } } }) as const;
+			// body-bearing verbs share the post adapter pattern
+			const bodyAdaptVerbs: readonly (
+				| "post"
+				| "put"
+				| "patch"
+				| "delete"
+			)[] = ["post", "put", "patch", "delete"];
+
+			for (const v of bodyAdaptVerbs) {
+				if (!def[v]) continue;
+				epAdapt[v] = (cfg: RuntimePostConfig) =>
+					({ [ns]: { [ep]: { [v]: cfg } } }) as const;
 			}
-			// TODO: put/patch/delete:same pattern as post
 
 			nsAdapt[ep] = epAdapt;
 		}
@@ -578,13 +586,18 @@ export const apiFactory = <S extends ApiSpec>(
 
 					const getAdapter = merged?.[ns]?.[ep]?.[v];
 
+					// body-bearing verbs (post/put/patch/delete) share the
+					// post runtime pattern: blocking input validation +
+					// payload mapping with the in/out health pair
+					const isBodyVerb = v !== "get";
+
 					group[ep] = async (args: unknown) => {
 						const call = args as unknown as CallBaseArgs & {
 							body?: unknown;
 						};
 
-						// POST input validation (blocking)
-						if (v === "post") {
+						// body-verb input validation (blocking)
+						if (isBodyVerb) {
 							if (isRecord(getAdapter)) {
 								const post = getAdapter as PostAdapter;
 								if (post.body) {
@@ -809,11 +822,11 @@ export const apiFactory = <S extends ApiSpec>(
 						}
 
 						/**
-						 * POST (existing model): keep your current behavior
-						 * - body adapter stays in the POST branch you already have below
-						 * - result mapping stays where it already is
+						 * body verbs (post/put/patch/delete, existing model):
+						 * - body adapter + blocking validation above
+						 * - result mapping with the in/out health pair
 						 */
-						if (v === "post") {
+						if (isBodyVerb) {
 							const post = isRecord(getAdapter)
 								? (getAdapter as PostAdapter)
 								: undefined;
