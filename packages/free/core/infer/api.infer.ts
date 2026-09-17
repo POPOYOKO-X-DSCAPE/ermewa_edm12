@@ -352,29 +352,46 @@ type JsonPayload<C> = C extends {
 		? T
 		: unknown;
 
-type PayloadValue<F> = F extends () => infer C
-	? C extends { as: "json" }
-		? JsonPayload<C>
-		: C extends { as: "text" }
-			? string
-			: C extends { as: "raw" }
-				? Response
-				: C extends { as: "blob" }
-					? Blob
-					: unknown
+// The codec dsl exposes OVERLOADED factory functions (`json<T>` vs
+// `json(schema)`). When a consumer uses the instantiation-expression form
+// (`json<Row>`), `typeof` yields the whole overload set and a plain
+// `F extends () => infer C` cannot infer from it.
+//
+// `(...args: any[]) => infer C` infers from the LAST overload. For json its
+// last overload is the schema one, whose return is a 0-arg factory holding
+// the codec token WITH the required schema marker — so the two-step
+// extraction below recovers the token (and its exact type) in every form:
+// - instantiation expression `json<Row>`  -> Row
+// - called schema form `json(schema)`     -> schema output
+// - plain factories (text/raw/blob/formData) -> their token
+// `never[]` parameters are the widest a type can be in contravariant
+// position, so the match succeeds for any concrete factory or overload set.
+type LastReturn<F> = F extends (...args: readonly never[]) => infer C
+	? C
 	: unknown;
+type CodecToken<F> = LastReturn<F> extends (...args: readonly never[]) => infer T
+	? T
+	: LastReturn<F>;
 
-type BodyValue<F> = F extends () => infer C
-	? C extends { as: "json" }
-		? JsonPayload<C>
-		: C extends { as: "text" }
-			? string
-			: C extends { as: "blob" }
+type PayloadValue<F> = CodecToken<F> extends { as: "json" }
+	? JsonPayload<CodecToken<F>>
+	: CodecToken<F> extends { as: "text" }
+		? string
+		: CodecToken<F> extends { as: "raw" }
+			? Response
+			: CodecToken<F> extends { as: "blob" }
 				? Blob
-				: C extends { as: "formData" }
-					? FormData
-					: unknown
-	: unknown;
+				: unknown;
+
+type BodyValue<F> = CodecToken<F> extends { as: "json" }
+	? JsonPayload<CodecToken<F>>
+	: CodecToken<F> extends { as: "text" }
+		? string
+		: CodecToken<F> extends { as: "blob" }
+			? Blob
+			: CodecToken<F> extends { as: "formData" }
+				? FormData
+				: unknown;
 
 type BodyOf<Cfg> = Cfg extends { body?: infer B }
 	? B extends BodyFactory<unknown>

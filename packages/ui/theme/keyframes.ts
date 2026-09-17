@@ -9,4 +9,13 @@ export const keyframes = defineKeyframes({
 			transform: "rotate(360deg)",
 		},
 	},
+	/** Soft opacity pulse for "something is live/working" status dots. */
+	agentPulse: {
+		"0%, 100%": {
+			opacity: "1",
+		},
+		"50%": {
+			opacity: "0.35",
+		},
+	},
 });

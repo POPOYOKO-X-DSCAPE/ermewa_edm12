@@ -135,42 +135,22 @@ type OutputForField<
 			: F extends OneRel<infer Target>
 				? Target extends Nodes
 					? F extends { readonly min: 0 }
-						?
-								| OutputNode<
-										Types,
-										Nodes,
-										Db,
-										Target,
-										Sel & NodeSpec<Types, Nodes, Db, Target>
-								  >
-								| undefined
-						: OutputNode<
-								Types,
-								Nodes,
-								Db,
-								Target,
-								Sel & NodeSpec<Types, Nodes, Db, Target>
-							>
+						? RelationOut<Types, Nodes, Db, Target, Sel> | undefined
+						: RelationOut<Types, Nodes, Db, Target, Sel>
 					: never
 				: F extends ManyRel<infer Target>
 					? Target extends Nodes
 						? F extends { readonly min: 0 }
 							?
-									| readonly OutputNode<
+									| readonly RelationOut<
 											Types,
 											Nodes,
 											Db,
 											Target,
-											Sel & NodeSpec<Types, Nodes, Db, Target>
+											Sel
 									  >[]
 									| undefined
-							: readonly OutputNode<
-									Types,
-									Nodes,
-									Db,
-									Target,
-									Sel & NodeSpec<Types, Nodes, Db, Target>
-								>[]
+							: readonly RelationOut<Types, Nodes, Db, Target, Sel>[]
 						: never
 					: F extends {
 								readonly __kind: "array";
@@ -211,6 +191,20 @@ type OutputInlineObject<
 		}
 	: Record<string, never>;
 
+/**
+ * relation output: only the selected keys are resolved — `self` reuses
+ * the enclosing selection (shape not expressible field-level) -> unknown
+ */
+type RelationOut<
+	Types extends Record<string, unknown>,
+	Nodes extends string,
+	Db extends GraphDb<Nodes, keyof Types & string>,
+	Target extends Nodes,
+	Sel,
+> = Sel extends SelfToken
+	? unknown
+	: OutputInlineObject<Types, Nodes, Db, Db[Target], Sel>;
+
 export type OutputNode<
 	Types extends Record<string, unknown>,
 	Nodes extends string,
@@ -228,6 +222,20 @@ type ManyErrors<Item> = {
 	readonly items: readonly Item[];
 };
 
+/**
+ * relation errors: mirror the selection keys only (same narrowing as
+ * RelationOut); `self` keeps the shaped envelope without inner keys
+ */
+type RelationErr<
+	Types extends Record<string, unknown>,
+	Nodes extends string,
+	Db extends GraphDb<Nodes, keyof Types & string>,
+	Target extends Nodes,
+	Sel,
+> = Sel extends SelfToken
+	? { readonly __self?: LeafErrors }
+	: ErrorsNode<Types, Nodes, Db, Target, Sel>;
+
 type ErrorsForField<
 	Types extends Record<string, unknown>,
 	Nodes extends string,
@@ -242,27 +250,13 @@ type ErrorsForField<
 			? Sel extends UnsetToken | ResetToken
 				? LeafErrors
 				: Target extends Nodes
-					? ErrorsNode<
-							Types,
-							Nodes,
-							Db,
-							Target,
-							Sel & NodeSpec<Types, Nodes, Db, Target>
-						>
+					? RelationErr<Types, Nodes, Db, Target, Sel>
 					: LeafErrors
 			: F extends ManyRel<infer Target>
 				? Sel extends UnsetToken | ResetToken
 					? LeafErrors
 					: Target extends Nodes
-						? ManyErrors<
-								ErrorsNode<
-									Types,
-									Nodes,
-									Db,
-									Target,
-									Sel & NodeSpec<Types, Nodes, Db, Target>
-								>
-							>
+						? ManyErrors<RelationErr<Types, Nodes, Db, Target, Sel>>
 						: LeafErrors
 				: F extends { readonly __kind: "array"; readonly of: infer OF }
 					? OF extends OneOfField<infer _T>
@@ -297,5 +291,5 @@ export type ErrorsNode<
 	Nodes extends string,
 	Db extends GraphDb<Nodes, keyof Types & string>,
 	Node extends Nodes,
-	Sel extends NodeSpec<Types, Nodes, Db, Node>,
+	Sel,
 > = ErrorsInlineObject<Types, Nodes, Db, Db[Node], Sel>;

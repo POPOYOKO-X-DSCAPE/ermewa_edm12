@@ -8,6 +8,33 @@ export type RuntimePrimaryKeyField = {
 	readonly of: string;
 };
 
+export type RuntimeSchemaLike = {
+	readonly parse: (input: unknown) => {
+		readonly value: unknown;
+		readonly health: { readonly ok: boolean };
+		readonly lean: { readonly value: unknown };
+		readonly error: {
+			readonly list: readonly {
+				readonly severity: "error" | "warn";
+				readonly message: string;
+			}[];
+		};
+	};
+	readonly infer: unknown;
+};
+
+export type RuntimeSchemaField = {
+	readonly __kind: "schema";
+	readonly schema: RuntimeSchemaLike;
+};
+
+export const isSchemaField = (
+	v: RuntimeEntityField,
+): v is RuntimeSchemaField =>
+	isRecord(v) &&
+	v.__kind === "schema" &&
+	typeof (v as RuntimeSchemaField).schema?.parse === "function";
+
 export const isLazyField = (
 	v: RuntimeEntityField,
 ): v is RuntimeLazyField =>
@@ -35,6 +62,7 @@ export type RuntimeEntityField =
 	| string
 	| RuntimePrimaryKeyField
 	| RuntimeLazyField
+	| RuntimeSchemaField
 	| { readonly [key: string]: RuntimeEntityField }
 	| { readonly __kind: "array"; readonly of: RuntimeEntityField }
 	| {
@@ -63,7 +91,7 @@ export type RuntimeEntityField =
 const isRecord = (
 	value: unknown,
 ): value is Record<PropertyKey, unknown> =>
-	typeof value === "object" && value !== null;
+	typeof value === "object" && value !== null && value !== undefined;
 
 const isObjectContainer = (
 	value: unknown,
@@ -221,6 +249,7 @@ const makeErrorNode = (node: RuntimeEntityField): unknown => {
 	if (isOptField(current)) return makeErrorNode(current.of);
 	if (isPrimaryKeyField(current)) return [];
 	if (isOneOfField(current)) return [];
+	if (isSchemaField(current)) return [];
 	if (isArrayField(current)) return {};
 	if (isDictField(current)) return {};
 	if (isRefField(current)) return [];
@@ -268,6 +297,7 @@ const clearErrorNode = (
 	if (
 		typeof current === "string" ||
 		isOneOfField(current) ||
+		isSchemaField(current) ||
 		isRefField(current)
 	) {
 		clearLeafError(err);
@@ -355,6 +385,31 @@ const validateScalarNode = (
 		if (typeof result === "string") {
 			err.push(result);
 			return;
+		}
+	}
+};
+
+const validateSchemaNode = (
+	def: RuntimeSchemaField,
+	val: unknown,
+	err: unknown,
+) => {
+	if (!Array.isArray(err)) return;
+
+	clearLeafError(err);
+
+	if (val === undefined) {
+		err.push("missing required field");
+		return;
+	}
+
+	const parsed = def.schema.parse(val);
+
+	if (parsed.health.ok) return;
+
+	for (const issue of parsed.error.list) {
+		if (issue.severity === "error") {
+			err.push(issue.message);
 		}
 	}
 };
@@ -489,6 +544,11 @@ const validateNodeFull = (
 		return;
 	}
 
+	if (isSchemaField(current)) {
+		validateSchemaNode(current, val, err);
+		return;
+	}
+
 	if (isRefField(current)) {
 		validateRefNode(current, val, err);
 		return;
@@ -614,6 +674,7 @@ const validateNodePath = (
 	if (
 		typeof current === "string" ||
 		isOneOfField(current) ||
+		isSchemaField(current) ||
 		isRefField(current)
 	) {
 		validateNodeFull(types, def, val, err, false);

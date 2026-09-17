@@ -1,4 +1,13 @@
+import type { SchemaLike } from "../infer/api.infer";
+
+export type { SchemaLike };
+
 export type TypeNames<D> = Extract<keyof D, string>;
+export interface SchemaField<T = unknown> {
+	readonly __kind: "schema";
+	readonly schema: SchemaLike<T>;
+	readonly __t?: T;
+}
 export interface PrimaryKeyField<TType extends string> {
 	readonly __kind: "primaryKey";
 	readonly of: TType;
@@ -71,6 +80,7 @@ export type EntityField<D> =
 	| OneOfField<readonly OneOfValue[]>
 	| DictField<D, EntityField<D>>
 	| LazyField<D, EntityField<D>>
+	| SchemaField
 	| SelfField;
 
 /* ============================================================
@@ -95,6 +105,8 @@ export type RefHelpers = {
 	has<MIN extends number>(min: MIN): RefBuilder<MIN>;
 };
 
+export type SchemaOut<S> = S extends SchemaLike<infer T> ? T : never;
+
 export type DefinitionHelpers<
 	D extends Record<string, unknown>,
 	TRefs extends Record<string, symbol>,
@@ -105,6 +117,9 @@ export type DefinitionHelpers<
 		...values: T
 	): OneOfField<T>;
 	dict<F extends EntityField<D>>(of: F): DictField<D, F>;
+	schema<S extends SchemaLike<unknown>>(
+		s: S,
+	): SchemaField<SchemaOut<S>>;
 	lazy<F extends EntityField<D>>(
 		build: (self: SelfField) => F,
 	): LazyField<D, F>;

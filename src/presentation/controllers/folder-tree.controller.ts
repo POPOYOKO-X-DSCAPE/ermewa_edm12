@@ -149,7 +149,7 @@ const readTargetFolderFromLocation = (): FolderRef | undefined => {
 
 	const sitePrefix = import.meta.env.BASE_URL.replace(/\/+$/, "");
 	const relativePathname = sitePrefix
-		? (url.pathname.slice(sitePrefix.length) || "/")
+		? url.pathname.slice(sitePrefix.length) || "/"
 		: url.pathname;
 	const segments = relativePathname.split("/").filter(Boolean);
 	const folderNameFromPath = segments[0] ?? "";
@@ -333,6 +333,10 @@ const normalizeNatureFlags = (
 
 const normalizeNatureMaxSize = (value: unknown): number | undefined =>
 	toPositiveInt(value);
+
+const normalizeNatureMode = (
+	mode: string | undefined,
+): "multi" | "mono" => (mode === "multi" ? "multi" : "mono");
 
 const normalizeDocumentIsLocal = (value: unknown): boolean =>
 	value === true;
@@ -1080,7 +1084,6 @@ export const folderTreeController = navigationBaseController
 			);
 
 			const inserted = repositories.nature.insert(
-				// @ts-ignore <TOFIX: mono / multi ts problem>
 				...natures.map((nature) => ({
 					code: nature.code,
 					label: {
@@ -1091,9 +1094,9 @@ export const folderTreeController = navigationBaseController
 					hasExpirationDate: nature.hasExpirationDate,
 					flags: normalizeNatureFlags(nature.flags),
 					maxSize: normalizeNatureMaxSize(nature.maxSize),
-					extensions: normalizeNatureExtensions(nature.extensions),
+					extensions: [...normalizeNatureExtensions(nature.extensions)],
 					folder: folderId,
-					mode: nature.mode === "multi" ? "multi" : "mono",
+					mode: normalizeNatureMode(nature.mode),
 				})),
 			);
 

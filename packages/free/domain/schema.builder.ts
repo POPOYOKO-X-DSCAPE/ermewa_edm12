@@ -19,6 +19,7 @@ import {
 	isOptField,
 	isPrimaryKeyField,
 	isRefField,
+	isSchemaField,
 	validateState,
 } from "../core/runtime/state.validation";
 
@@ -342,6 +343,8 @@ const sanitizeField = (
 	if (typeof current === "string") return val;
 	if (isRecord(current) && current.__kind === "oneOf") return val;
 	if (isRefField(current)) return val;
+	if (isSchemaField(current))
+		return current.schema.parse(val).lean.value;
 
 	if (isArrayField(current)) {
 		if (!Array.isArray(val)) return val;
@@ -550,7 +553,13 @@ const collectUnknownKeyWarnings = (
 		return collectUnknownKeyWarnings(current.of, val, path, issues);
 	}
 
-	if (typeof current === "string" || isRefField(current)) return;
+	if (
+		typeof current === "string" ||
+		isRefField(current) ||
+		isSchemaField(current)
+	) {
+		return;
+	}
 
 	if (isArrayField(current)) {
 		if (!Array.isArray(val)) return;

@@ -6,6 +6,7 @@ import type {
 	OneOfField,
 	PrimaryKeyField,
 	RefField,
+	SchemaField,
 	SelfField,
 	TypeNames,
 } from "../dsl/state.definition";
@@ -85,64 +86,67 @@ export type InferFieldState<
 								? string | undefined
 								: string
 							: string[]
-						: // "type?"
-							F extends `${infer T}?`
-							? T extends TypeNames<D>
-								? RuntimeType<D[T]> | undefined
-								: never
-							: // scalar
-								F extends TypeNames<D>
-								? RuntimeType<D[F]>
-								: // array
-									F extends ArrayField<D, infer OF>
-									? InferFieldState<D, OF, Depth, Self>[]
-									: // opt
-										F extends {
-												readonly __kind: "opt";
-												readonly of: infer OF;
-											}
-										? InferFieldState<D, OF, Depth, Self> | undefined
-										: // dict
-											F extends DictField<D, infer OF, infer K>
-											? string extends K
-												? Record<
-														string,
-														InferFieldState<D, OF, Depth, Self>
-													>
-												: Partial<
-														Record<
-															K,
+						: // schema (opaque value, output of the schema)
+							F extends SchemaField<infer T>
+							? T
+							: // "type?"
+								F extends `${infer T}?`
+								? T extends TypeNames<D>
+									? RuntimeType<D[T]> | undefined
+									: never
+								: // scalar
+									F extends TypeNames<D>
+									? RuntimeType<D[F]>
+									: // array
+										F extends ArrayField<D, infer OF>
+										? InferFieldState<D, OF, Depth, Self>[]
+										: // opt
+											F extends {
+													readonly __kind: "opt";
+													readonly of: infer OF;
+												}
+											? InferFieldState<D, OF, Depth, Self> | undefined
+											: // dict
+												F extends DictField<D, infer OF, infer K>
+												? string extends K
+													? Record<
+															string,
 															InferFieldState<D, OF, Depth, Self>
 														>
-													>
-											: // object
-												F extends {
-														readonly [key: string]: EntityField<D>;
-													}
-												? {
-														[K in keyof F as ObjIsOptional<
-															F[K]
-														> extends true
-															? never
-															: K]: InferFieldState<
-															D,
-															ObjStripOptional<F[K]>,
-															Depth,
-															Self
-														>;
-													} & {
-														[K in keyof F as ObjIsOptional<
-															F[K]
-														> extends true
-															? K
-															: never]?: InferFieldState<
-															D,
-															ObjStripOptional<F[K]>,
-															Depth,
-															Self
-														>;
-													}
-												: never;
+													: Partial<
+															Record<
+																K,
+																InferFieldState<D, OF, Depth, Self>
+															>
+														>
+												: // object
+													F extends {
+															readonly [key: string]: EntityField<D>;
+														}
+													? {
+															[K in keyof F as ObjIsOptional<
+																F[K]
+															> extends true
+																? never
+																: K]: InferFieldState<
+																D,
+																ObjStripOptional<F[K]>,
+																Depth,
+																Self
+															>;
+														} & {
+															[K in keyof F as ObjIsOptional<
+																F[K]
+															> extends true
+																? K
+																: never]?: InferFieldState<
+																D,
+																ObjStripOptional<F[K]>,
+																Depth,
+																Self
+															>;
+														}
+													: never;
 
 /* ============================================================
  * ENTITY STATE

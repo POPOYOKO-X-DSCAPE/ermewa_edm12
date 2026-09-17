@@ -1,11 +1,14 @@
 import type {
 	EntityField,
 	EntityHelpers,
+	SchemaField,
+	SchemaLike,
+	SchemaOut,
 } from "../core/dsl/state.definition";
 import type { InferEntityState } from "../core/infer/state.infer";
 import {
-	ReactiveKeys,
 	type ReactiveKey,
+	ReactiveKeys,
 } from "../core/runtime/reactive-keys";
 import {
 	type EntityRefs,
@@ -113,6 +116,12 @@ export const entityBuilder = <
 						values,
 					}) as const,
 				dict: (of) => makeDictField(of),
+				schema: <S extends SchemaLike<unknown>>(
+					s: S,
+				): SchemaField<SchemaOut<S>> =>
+					({ __kind: "schema", schema: s }) as SchemaField<
+						SchemaOut<S>
+					>,
 				lazy: (of) => ({
 					__kind: "lazy",
 					of,
@@ -202,33 +211,52 @@ export const entityBuilder = <
 					notifyPaths: (paths) => {
 						const uniqueSources = new Set<ReactiveKey>();
 
-						uniqueSources.add(
-							ReactiveKeys.repo(
-								repoName,
-								"byId",
-								meta.id,
-								"meta",
-								"updatedAt",
-							),
-						);
+						// notify under every identity key (meta.id alias +
+						// the live primaryKey value when set)
+						const idKeys = [meta.id];
+						const pkName = pkFields[0];
+						if (pkName) {
+							const pk = (state.state as Record<string, unknown>)[
+								pkName
+							];
+							if (typeof pk === "string" && pk.length) {
+								idKeys.push(pk);
+							} else if (pk !== null && pk !== undefined) {
+								idKeys.push(String(pk));
+							}
+						}
+
+						for (const idKey of idKeys) {
+							uniqueSources.add(
+								ReactiveKeys.repo(
+									repoName,
+									"byId",
+									idKey,
+									"meta",
+									"updatedAt",
+								),
+							);
+						}
 
 						for (const path of paths) {
-							uniqueSources.add(
-								path.length
-									? ReactiveKeys.repo(
-										repoName,
-										"byId",
-										meta.id,
-										"state",
-										...path,
-									)
-									: ReactiveKeys.repo(
-										repoName,
-										"byId",
-										meta.id,
-										"state",
-									),
-							);
+							for (const idKey of idKeys) {
+								uniqueSources.add(
+									path.length
+										? ReactiveKeys.repo(
+												repoName,
+												"byId",
+												idKey,
+												"state",
+												...path,
+											)
+										: ReactiveKeys.repo(
+												repoName,
+												"byId",
+												idKey,
+												"state",
+											),
+								);
+							}
 						}
 
 						notifyRepoSources(Array.from(uniqueSources));

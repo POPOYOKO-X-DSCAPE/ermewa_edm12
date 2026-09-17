@@ -1,11 +1,14 @@
 import type {
 	DefinitionHelpers,
 	EntityField,
+	SchemaField,
+	SchemaLike,
+	SchemaOut,
 } from "../core/dsl/state.definition";
 import type { InferEntityState } from "../core/infer/state.infer";
 import {
-	ReactiveKeys,
 	type ReactiveKey,
+	ReactiveKeys,
 } from "../core/runtime/reactive-keys";
 import { makeRefBuilder } from "../core/runtime/refs.runtime";
 import {
@@ -54,6 +57,12 @@ export const storeBuilder = <
 						values,
 					}) as const,
 				dict: (of) => makeDictField(of),
+				schema: <S extends SchemaLike<unknown>>(
+					s: S,
+				): SchemaField<SchemaOut<S>> =>
+					({ __kind: "schema", schema: s }) as SchemaField<
+						SchemaOut<S>
+					>,
 				lazy: (of) => ({
 					__kind: "lazy",
 					of,

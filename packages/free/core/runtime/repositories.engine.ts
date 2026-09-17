@@ -13,11 +13,7 @@ import type {
 	SetCb,
 } from "../infer/repositories.infer";
 
-import type {
-	GraphDb,
-	ManyRel,
-	OneRel,
-} from "../dsl/graph.definition";
+import type { GraphDb, ManyRel, OneRel } from "../dsl/graph.definition";
 import type {
 	ErrorsNode,
 	NodeSpec,
@@ -31,13 +27,13 @@ import type {
 	ArrayField,
 	EntityObjectField,
 	OneOfField,
+	OptionalField,
 	RefField,
 } from "../dsl/state.definition";
 import type { Kind } from "../symbols";
-import {
-	ReactiveKeys,
-	type ReactiveKey,
-} from "./reactive-keys";
+import { ENTITY_PRIMARY_KEY } from "../symbols";
+import { type ReactiveKey, ReactiveKeys } from "./reactive-keys";
+import { stripOptionalType } from "./state.optional";
 
 /* ---------------------------------------------
    GraphDb inference from entity builders
@@ -70,6 +66,16 @@ type TargetNameFromKind<S extends symbol> = S extends Kind<infer N>
 	? N
 	: never;
 
+type ToGraphOptionalField<
+	Nodes extends string,
+	TypeNames extends string,
+	F,
+> = F extends `${infer T}?`
+	? `${ToGraphField<Nodes, TypeNames, T>}?`
+	: F extends TypeNames
+		? `${F}?`
+		: ToGraphField<Nodes, TypeNames, F>;
+
 type ToGraphField<
 	Nodes extends string,
 	TypeNames extends string,
@@ -86,26 +92,28 @@ type ToGraphField<
 				? {
 						readonly __kind: "array";
 						readonly of: ToGraphField<Nodes, TypeNames, OF>;
-				  }
-				: F extends EntityObjectField<Record<string, unknown>>
-					? {
-							readonly [K in keyof F & string]: ToGraphField<
-								Nodes,
-								TypeNames,
-								F[K]
-							>;
-						}
-					: F extends RefField<infer MIN, infer MAX, infer T>
-						? TargetNameFromKind<T> extends infer Target
-							? Target extends Nodes
-								? MAX extends "n"
-									? ManyRel<Target> & { readonly min: Min01<MIN> }
-									: MAX extends 1
-										? OneRel<Target> & { readonly min: Min01<MIN> }
-										: ManyRel<Target> & { readonly min: Min01<MIN> }
+					}
+				: F extends OptionalField<Record<string, unknown>, infer OF>
+					? ToGraphOptionalField<Nodes, TypeNames, OF>
+					: F extends EntityObjectField<Record<string, unknown>>
+						? {
+								readonly [K in keyof F & string]: ToGraphField<
+									Nodes,
+									TypeNames,
+									F[K]
+								>;
+							}
+						: F extends RefField<infer MIN, infer MAX, infer T>
+							? TargetNameFromKind<T> extends infer Target
+								? Target extends Nodes
+									? MAX extends "n"
+										? ManyRel<Target> & { readonly min: Min01<MIN> }
+										: MAX extends 1
+											? OneRel<Target> & { readonly min: Min01<MIN> }
+											: ManyRel<Target> & { readonly min: Min01<MIN> }
+									: never
 								: never
-							: never
-						: never;
+							: never;
 
 type StripMetaKeys<T> = T extends object
 	? Omit<T, PropertyKey & symbol>
@@ -122,7 +130,7 @@ type ToGraphNode<
 				TypeNames,
 				Schema[K]
 			>;
-	  }
+		}
 	: Record<string, never>;
 
 type InferGraphDbFromBuilders<
@@ -203,17 +211,36 @@ const isRefValue = (
 	return max === "n";
 };
 
+const isOptValue = (
+	v: unknown,
+): v is { readonly __kind: "opt"; readonly of: unknown } => {
+	if (!isRecord(v)) return false;
+	if (v.__kind !== "opt") return false;
+	return "of" in v;
+};
+
 const buildGraphFieldRuntime = (
 	field: unknown,
 	kindToName: Map<symbol, string>,
 ): unknown => {
 	if (typeof field === "string") return field;
 
+	// schema fields are opaque to the graph db: skip the key entirely
+	if (hasKind(field, "schema")) return undefined;
+
 	if (isPrimaryKeyValue(field)) return field.of;
 
 	if (isArrayValue(field)) {
 		const of = buildGraphFieldRuntime(field.of, kindToName);
 		return { __kind: "array", of };
+	}
+
+	if (isOptValue(field)) {
+		const inner = buildGraphFieldRuntime(field.of, kindToName);
+		if (typeof inner === "string") {
+			return `${stripOptionalType(inner)}?`;
+		}
+		return inner;
 	}
 
 	if (isRefValue(field)) {
@@ -376,6 +403,23 @@ export const makeRepositoriesEngine = <
 			);
 		}
 
+		// entities expose their declared primaryKey field name on the builder
+		const pkFieldByKind = new Map<symbol, string>();
+		for (const b of builders) {
+			const maybe = b as {
+				kind?: symbol;
+				schema?: Record<PropertyKey, unknown>;
+			};
+			if (!maybe.kind || !maybe.schema) continue;
+
+			const pk = maybe.schema[ENTITY_PRIMARY_KEY] as
+				| readonly string[]
+				| undefined;
+			if (pk?.length) {
+				pkFieldByKind.set(maybe.kind, pk[0]);
+			}
+		}
+
 		for (const n of names) {
 			const bucket = buckets[n];
 			const entityIndex = entitiesById[n];
@@ -385,6 +429,23 @@ export const makeRepositoriesEngine = <
 				ReactiveKeys.repo(n, "byId", id);
 			const entityLookupSource = (id: string) =>
 				ReactiveKeys.repo(n, "lookup", id);
+
+			const pkField = pkFieldByKind.get(kind);
+
+			// identity keys: the configured id (meta.id alias) + the declared
+			// primaryKey value when set (business identity lookup)
+			const readIdKeys = (entity: E): string[] => {
+				const keys: string[] = [config.getId(entity)];
+				if (pkField) {
+					const pk = (entity.state as Record<string, unknown>)[pkField];
+					if (typeof pk === "string" && pk.length) {
+						keys.push(pk);
+					} else if (pk !== null && pk !== undefined) {
+						keys.push(String(pk));
+					}
+				}
+				return Array.from(new Set(keys));
+			};
 
 			type E = EntitiesByKind[typeof n];
 
@@ -404,9 +465,11 @@ export const makeRepositoriesEngine = <
 
 					for (const entity of created) {
 						bucket.push(entity);
-						const id = config.getId(entity);
-						entityIndex.set(id, entity);
-						sources.push(entityLookupSource(id));
+						const keys = readIdKeys(entity);
+						for (const key of keys) {
+							entityIndex.set(key, entity);
+							sources.push(entityLookupSource(key));
+						}
 					}
 
 					notifySources(subscriber, sources);
@@ -421,7 +484,9 @@ export const makeRepositoriesEngine = <
 
 				select(pick) {
 					const selected = pick(bucket);
-					const ids = new Set(selected.map(config.getId));
+					const ids = new Set(
+						selected.flatMap((entity) => readIdKeys(entity)),
+					);
 
 					function delete_() {
 						const removedIds: string[] = [];
@@ -429,14 +494,16 @@ export const makeRepositoriesEngine = <
 
 						while (i--) {
 							const current = bucket[i] as E;
-							const id = config.getId(current);
-							if (!ids.has(id)) {
+							const keys = readIdKeys(current);
+							if (!keys.some((key) => ids.has(key))) {
 								continue;
 							}
 
 							bucket.splice(i, 1);
-							entityIndex.delete(id);
-							removedIds.push(id);
+							for (const key of keys) {
+								entityIndex.delete(key);
+								removedIds.push(key);
+							}
 						}
 
 						if (!removedIds.length) {
@@ -459,33 +526,51 @@ export const makeRepositoriesEngine = <
 
 						for (let i = 0; i < bucket.length; i++) {
 							const current = bucket[i] as E;
-							const previousId = config.getId(current);
+							const previousKeys = readIdKeys(current);
 
-							if (!ids.has(previousId)) continue;
+							if (!previousKeys.some((key) => ids.has(key))) continue;
 
 							const next = (
 								current as unknown as { patch(x: unknown): unknown }
 							).patch(plan) as E;
 
 							bucket[i] = next as unknown as EntitiesByKind[typeof n];
-							const nextId = config.getId(next);
-							entityIndex.set(nextId, next);
+							const nextKeys = readIdKeys(next);
+							const nextKeySet = new Set(nextKeys);
+							for (const key of nextKeys) {
+								entityIndex.set(key, next);
+							}
+							let keysChanged = false;
+							for (const key of previousKeys) {
+								if (!nextKeySet.has(key)) {
+									entityIndex.delete(key);
+									keysChanged = true;
+								}
+							}
 							out.push(next);
 
-							if (nextId !== previousId) {
+							if (keysChanged) {
 								didChangeIds = true;
-								entityIndex.delete(previousId);
-								idChangeSources.push(
-									entityRootSource(previousId),
-									entityRootSource(nextId),
-									entityLookupSource(previousId),
-									entityLookupSource(nextId),
-								);
+								for (const key of previousKeys) {
+									idChangeSources.push(
+										entityRootSource(key),
+										entityLookupSource(key),
+									);
+								}
+								for (const key of nextKeys) {
+									idChangeSources.push(
+										entityRootSource(key),
+										entityLookupSource(key),
+									);
+								}
 							}
 						}
 
 						if (didChangeIds || idChangeSources.length) {
-							notifySources(subscriber, [idsSource, ...idChangeSources]);
+							notifySources(subscriber, [
+								idsSource,
+								...idChangeSources,
+							]);
 						}
 
 						return out;
@@ -498,33 +583,51 @@ export const makeRepositoriesEngine = <
 
 						for (let i = 0; i < bucket.length; i++) {
 							const current = bucket[i] as E;
-							const previousId = config.getId(current);
+							const previousKeys = readIdKeys(current);
 
-							if (!ids.has(previousId)) continue;
+							if (!previousKeys.some((key) => ids.has(key))) continue;
 
 							const next = (
 								current as unknown as { set(x: unknown): unknown }
 							).set(plan) as E;
 
 							bucket[i] = next as unknown as EntitiesByKind[typeof n];
-							const nextId = config.getId(next);
-							entityIndex.set(nextId, next);
+							const nextKeys = readIdKeys(next);
+							const nextKeySet = new Set(nextKeys);
+							for (const key of nextKeys) {
+								entityIndex.set(key, next);
+							}
+							let keysChanged = false;
+							for (const key of previousKeys) {
+								if (!nextKeySet.has(key)) {
+									entityIndex.delete(key);
+									keysChanged = true;
+								}
+							}
 							out.push(next);
 
-							if (nextId !== previousId) {
+							if (keysChanged) {
 								didChangeIds = true;
-								entityIndex.delete(previousId);
-								idChangeSources.push(
-									entityRootSource(previousId),
-									entityRootSource(nextId),
-									entityLookupSource(previousId),
-									entityLookupSource(nextId),
-								);
+								for (const key of previousKeys) {
+									idChangeSources.push(
+										entityRootSource(key),
+										entityLookupSource(key),
+									);
+								}
+								for (const key of nextKeys) {
+									idChangeSources.push(
+										entityRootSource(key),
+										entityLookupSource(key),
+									);
+								}
 							}
 						}
 
 						if (didChangeIds || idChangeSources.length) {
-							notifySources(subscriber, [idsSource, ...idChangeSources]);
+							notifySources(subscriber, [
+								idsSource,
+								...idChangeSources,
+							]);
 						}
 
 						return out;
@@ -539,9 +642,9 @@ export const makeRepositoriesEngine = <
 
 						for (let i = 0; i < bucket.length; i++) {
 							const current = bucket[i] as E;
-							const previousId = config.getId(current);
+							const previousKeys = readIdKeys(current);
 
-							if (!ids.has(previousId)) continue;
+							if (!previousKeys.some((key) => ids.has(key))) continue;
 
 							const mapped = mapper(current);
 							const arg =
@@ -554,24 +657,42 @@ export const makeRepositoriesEngine = <
 							).patch(arg) as E;
 
 							bucket[i] = next as unknown as EntitiesByKind[typeof n];
-							const nextId = config.getId(next);
-							entityIndex.set(nextId, next);
+							const nextKeys = readIdKeys(next);
+							const nextKeySet = new Set(nextKeys);
+							for (const key of nextKeys) {
+								entityIndex.set(key, next);
+							}
+							let keysChanged = false;
+							for (const key of previousKeys) {
+								if (!nextKeySet.has(key)) {
+									entityIndex.delete(key);
+									keysChanged = true;
+								}
+							}
 							out.push(next);
 
-							if (nextId !== previousId) {
+							if (keysChanged) {
 								didChangeIds = true;
-								entityIndex.delete(previousId);
-								idChangeSources.push(
-									entityRootSource(previousId),
-									entityRootSource(nextId),
-									entityLookupSource(previousId),
-									entityLookupSource(nextId),
-								);
+								for (const key of previousKeys) {
+									idChangeSources.push(
+										entityRootSource(key),
+										entityLookupSource(key),
+									);
+								}
+								for (const key of nextKeys) {
+									idChangeSources.push(
+										entityRootSource(key),
+										entityLookupSource(key),
+									);
+								}
 							}
 						}
 
 						if (didChangeIds || idChangeSources.length) {
-							notifySources(subscriber, [idsSource, ...idChangeSources]);
+							notifySources(subscriber, [
+								idsSource,
+								...idChangeSources,
+							]);
 						}
 
 						return out;
@@ -586,9 +707,9 @@ export const makeRepositoriesEngine = <
 
 						for (let i = 0; i < bucket.length; i++) {
 							const current = bucket[i] as E;
-							const previousId = config.getId(current);
+							const previousKeys = readIdKeys(current);
 
-							if (!ids.has(previousId)) continue;
+							if (!previousKeys.some((key) => ids.has(key))) continue;
 
 							const mapped = mapper(current);
 							const arg =
@@ -601,24 +722,42 @@ export const makeRepositoriesEngine = <
 							).set(arg) as E;
 
 							bucket[i] = next as unknown as EntitiesByKind[typeof n];
-							const nextId = config.getId(next);
-							entityIndex.set(nextId, next);
+							const nextKeys = readIdKeys(next);
+							const nextKeySet = new Set(nextKeys);
+							for (const key of nextKeys) {
+								entityIndex.set(key, next);
+							}
+							let keysChanged = false;
+							for (const key of previousKeys) {
+								if (!nextKeySet.has(key)) {
+									entityIndex.delete(key);
+									keysChanged = true;
+								}
+							}
 							out.push(next);
 
-							if (nextId !== previousId) {
+							if (keysChanged) {
 								didChangeIds = true;
-								entityIndex.delete(previousId);
-								idChangeSources.push(
-									entityRootSource(previousId),
-									entityRootSource(nextId),
-									entityLookupSource(previousId),
-									entityLookupSource(nextId),
-								);
+								for (const key of previousKeys) {
+									idChangeSources.push(
+										entityRootSource(key),
+										entityLookupSource(key),
+									);
+								}
+								for (const key of nextKeys) {
+									idChangeSources.push(
+										entityRootSource(key),
+										entityLookupSource(key),
+									);
+								}
 							}
 						}
 
 						if (didChangeIds || idChangeSources.length) {
-							notifySources(subscriber, [idsSource, ...idChangeSources]);
+							notifySources(subscriber, [
+								idsSource,
+								...idChangeSources,
+							]);
 						}
 
 						return out;
